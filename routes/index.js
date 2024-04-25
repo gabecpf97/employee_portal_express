@@ -3,7 +3,7 @@ const router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("index", { title: "Express" });
+  res.send("<h1>Employee portal backend</h1>");
 });
 
-module.exports = router;
+export default router;
