@@ -4,17 +4,19 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import { fileURLToPath } from "url";
-import userRoutes from './routes/userRoute.js'
-import connection from "./config/db.js"
-
+import userRoutes from "./routes/userRoute.js";
+import connection from "./config/db.js";
+import applicationRouter from "./routes/applicationRoute.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-connection.once('open', () => {
-    app.listen(3000, () => console.log(`Server is running on http://localhost:${PORT}`));
+connection.once("open", () => {
+  app.listen(3000, () =>
+    console.log(`Server is running on http://localhost:${PORT}`)
+  );
 });
 
 app.use(logger("dev"));
@@ -24,6 +26,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // app.use("/", indexRouter);
-app.use('/',userRoutes);
+app.use("/", userRoutes);
+app.use("/application", applicationRouter);
+
+app.use((err, _req, res, _next) => {
+  res.status(err.code | 500);
+  res.send({ message: err.message });
+});
 
 export default app;
