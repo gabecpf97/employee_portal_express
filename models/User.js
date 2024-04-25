@@ -6,8 +6,8 @@ const UserSchema = new Schema({
     username: { type: String, required: true },
     password: { type: String, required: true },
     email: { type: String, required: true },
-    status: { type: String, required: true }, //not start, rejected, pending, approved
-    isHR: { type: Boolean, required: true}, //true=>HR, false=>user
+    status: { type: String, required: true , default: "not start"}, //not start, rejected, pending, approved
+    isHR: { type: Boolean, required: true, default: false}, //true=>HR, false=>user
     applicationId: { type: refType, ref:"Application" },
     housingId: { type: refType, ref:"Housing" }
 });

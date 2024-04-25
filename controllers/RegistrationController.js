@@ -1,4 +1,4 @@
-import {User} from '../models/User.js'
+import User from '../models/User.js'
 import argon2 from 'argon2';
 import generateToken from '../utils/generateToken.js';
 
@@ -8,7 +8,7 @@ const RegisterPageController = async (req, res) => {
         const duplicate = await User.findOne({$or: [{ email: email}, { username: username}]}).lean().exec();
         if (duplicate) {
             console.log("Duplicate identity")
-            return res.status(400).json({
+            return res.status(400).send({
                 message: "username or email already exists"
             });
         }
@@ -16,7 +16,7 @@ const RegisterPageController = async (req, res) => {
         // genertate hashed password from argon2
         const hashedPassword = await argon2.hash(password);
 
-        const newUser = new User.create({
+        const newUser = await User.create({
             username: username,
             email: email,
             password: hashedPassword,
@@ -24,10 +24,10 @@ const RegisterPageController = async (req, res) => {
         console.log("user created successfully");
 
         const token = generateToken(newUser._id, newUser.username);
-        return res.status(201).json({ token });
+        return res.status(201).send({ token });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
+        return res.status(500).send({
             message: error.message
         });
     }

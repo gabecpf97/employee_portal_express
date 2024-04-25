@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./bin/www.js"
+    "start": "nodemon ./bin/www.js",
+    "dev": "nodemon ./app.js"
   },
   "dependencies": {
     "argon2": "^0.40.1",
@@ -13,9 +14,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
     "morgan": "~1.9.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
