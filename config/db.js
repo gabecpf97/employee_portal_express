@@ -1,6 +1,12 @@
-const mongoose = require('mongoose');
-const path = require("path");
-require('dotenv').config(path.join(__dirname, '../.env'));
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 mongoose.set('strictQuery', false);
 
@@ -12,4 +18,4 @@ mongoose
     .then(() => console.log('Connected to Database'))
     .catch((err) => console.error(err));
 
-module.exports = mongoose.connection;
+export default mongoose.connection;

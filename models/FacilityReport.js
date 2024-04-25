@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const refType = Schema.Types.ObjectId;
 
@@ -33,4 +33,4 @@ const FacilityReportSchema = new Schema({
 
 const FacilityReport = mongoose.model("FacilityReport", FacilityReportSchema, "FacilityReport");
 
-module.exports = FacilityReport;
+export default FacilityReport;

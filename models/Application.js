@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const refType = Schema.Types.ObjectId;
 
@@ -61,4 +61,4 @@ const ApplicationSchema = new Schema({
 
 const Application = mongoose.model("Application", ApplicationSchema, "Application");
 
-module.exports = Application;
+export default Application;

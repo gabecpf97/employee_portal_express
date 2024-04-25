@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const refType = Schema.Types.ObjectId;
 
@@ -29,4 +29,4 @@ const OPTRequestSchema = new Schema({
 
 const OPTRequest = mongoose.model("OPTRequest", OPTRequestSchema, "OPTRequest");
 
-module.exports = OPTRequest;
+export default OPTRequest;
