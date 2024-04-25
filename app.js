@@ -4,9 +4,10 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import { fileURLToPath } from "url";
-import userRoutes from './routes/userRoute.js'
-import connection from "./config/db.js"
-
+import userRoutes from './routes/userRoute.js';
+import authRoutes from './routes/authRoute.js';
+import housingRoutes from './routes/housingRoute.js';
+import connection from "./config/db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,7 +24,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use("/", indexRouter);
-app.use('/',userRoutes);
+app.use('/user', userRoutes);
+app.use('/auth', authRoutes);
+app.use('/housing', housingRoutes);
+app.use("/", indexRouter);
 
 export default app;
