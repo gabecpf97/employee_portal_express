@@ -29,8 +29,8 @@ const applicationValidator = (req, res, next) => {
     return res.status(422).send({ message: "Please enter valid status" });
   }
   // check picture
-  if (!picture) {
-    req.body.picture = "default placeholder image";
+  if (!picture || picture == "") {
+    req.body.application.picture = "default placeholder image";
   }
   // check phone valid
   if (!checkPhone(cellPhone)) {

@@ -13,10 +13,15 @@ applicationRouter.post(
   applicationController.application_create
 );
 
-applicationRouter.put("/update", applicationController.application_update);
-
 applicationRouter.put(
-  "/hr/update",
+  "/update/:id",
+  inputValidaton.applicationFieldValidation,
+  applicationValidator,
+  applicationController.application_update
+);
+// need a middleware for checking isHR
+applicationRouter.put(
+  "/hr/update/:id",
   applicationController.application_hr_update
 );
 

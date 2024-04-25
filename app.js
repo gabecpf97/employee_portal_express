@@ -5,6 +5,8 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import { fileURLToPath } from "url";
 import userRoutes from "./routes/userRoute.js";
+import authRoutes from "./routes/authRoute.js";
+import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 
@@ -25,12 +27,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use("/", indexRouter);
-app.use("/", userRoutes);
+app.use("/user", userRoutes);
+app.use("/auth", authRoutes);
+app.use("/housing", housingRoutes);
 app.use("/application", applicationRouter);
+app.use("/", indexRouter);
 
 app.use((err, _req, res, _next) => {
-  res.status(err.code | 500);
+  res.status(err.code);
   res.send({ message: err.message });
 });
 
