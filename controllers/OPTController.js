@@ -16,7 +16,7 @@ const optrequest_update_doc = async (req, res, next) => {
         const updateRequest = theOptRequest;
         updateRequest[theOptRequest.step] = {
           status: "pending",
-          document: "req.body.docLink",
+          document: req.body.docLink,
           feedback: "",
         };
         await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
