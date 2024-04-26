@@ -1,4 +1,5 @@
 import Application from "../models/Application.js";
+import OPTRequest from "../models/OPTRequest.js";
 
 // Allows HR to see a summary of each employee’s profile
 const application_getAll = async (req, res) => {
@@ -56,6 +57,19 @@ const application_get = async (req, res, next) => {
 const application_create = async (req, res, next) => {
   try {
     const newApplication = new Application(req.body.application);
+    // create new opt request if select f1opt
+    if (newApplication.workAuthorization.type === "f1opt") {
+      const newOPt = new OPTRequest({
+        userId: req.body.userId,
+        steps: "OPTReceipt",
+        OPTReceipt: {
+          status: "pending",
+          document: newApplication.workAuthorization.document,
+          feedback: "",
+        },
+      });
+      await newOPt.save();
+    }
     await newApplication.save();
     res.status(200).send({ id: newApplication._id });
   } catch (err) {
