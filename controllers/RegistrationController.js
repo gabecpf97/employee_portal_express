@@ -1,7 +1,7 @@
-import User from '../models/User.js'
+import User from '../models/User.js';
 import argon2 from 'argon2';
 import generateToken from '../utils/generateToken.js';
-import Housing from '../models/Housing.js'
+import Housing from '../models/Housing.js';
 
 const RegisterPageController = async (req, res) => {
     const { username, email, password } = req.body;
@@ -47,7 +47,11 @@ const RegisterPageController = async (req, res) => {
         )
 
         const token = generateToken(newUser._id, newUser.username);
-        return res.status(201).send({ token });
+        return res.status(201).send(
+            {status:"success", 
+            token, 
+            userStatus: newUser.status, 
+            isHR: newUser.isHR });
     } catch (error) {
         console.log(error);
         return res.status(500).send({
@@ -56,16 +60,5 @@ const RegisterPageController = async (req, res) => {
     }
 }
 
-const createHousing = async (req, res) => {
-    try {
-        const newHousing = await Housing.create(req.body)
-        return res.status(200).send({message: "house created", newHousing});
-    } catch (error) {
-        return res.status(500).send({
-            message: error.message
-        });
-    }
-}
 
-export {RegisterPageController,
-    createHousing};
+export {RegisterPageController};
