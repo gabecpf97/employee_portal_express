@@ -1,4 +1,45 @@
 import Application from "../models/Application.js";
+import OPTRequest from "../models/OPTRequest.js";
+
+// Allows HR to see a summary of each employee’s profile
+const application_getAll = async (req, res) => {
+  try {
+    const applications = await Application.find();
+
+    res.status(200).json({
+      length: applications.length,
+      applications,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// search for employees by first name, last name or preferred name
+const application_filter = async (req, res) => {
+  try {
+    const { firstName, lastName, preferredName } = req.query;
+
+    // Build the search query based on provided query params
+    const searchQuery = {};
+    if (firstName) {
+      searchQuery["firstName"] = { $regex: firstName, $options: "i" };
+    }
+    if (lastName) {
+      searchQuery["lastName"] = { $regex: lastName, $options: "i" };
+    }
+    if (preferredName) {
+      searchQuery["preferredName"] = { $regex: preferredName, $options: "i" };
+    }
+    const filteredApplications = await Application.find({ ...searchQuery });
+    res.status(200).json({
+      length: filteredApplications.length,
+      filteredApplications,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 const application_get = async (req, res, next) => {
   try {
@@ -16,6 +57,28 @@ const application_get = async (req, res, next) => {
 const application_create = async (req, res, next) => {
   try {
     const newApplication = new Application(req.body.application);
+    // create new opt request if select f1opt
+    if (newApplication.workAuthorization.type === "f1opt") {
+      const newOPt = new OPTRequest({
+        userId: req.body.userId,
+        step: "OPTReceipt",
+        OPTReceipt: {
+          status: "pending",
+          document: newApplication.workAuthorization.document,
+          feedback: "",
+        },
+        OPTEAD: {
+          status: "unuploaded",
+        },
+        I983: {
+          status: "unuploaded",
+        },
+        I20: {
+          status: "unuploaded",
+        },
+      });
+      await newOPt.save();
+    }
     await newApplication.save();
     res.status(200).send({ id: newApplication._id });
   } catch (err) {
@@ -64,6 +127,8 @@ const application_hr_update = async (req, res, next) => {
 };
 
 const applicationController = {
+  application_getAll,
+  application_filter,
   application_get,
   application_create,
   application_update,
