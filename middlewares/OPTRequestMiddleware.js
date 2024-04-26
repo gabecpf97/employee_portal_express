@@ -1,6 +1,4 @@
-import validator from "validator";
-
-const optRequestValidator = (req, res, next) => {
+const step_validator = (req, res, next) => {
   if (req.body.step === "") {
     return res.status(422).send({ message: "Please enter form step" });
   }
@@ -13,6 +11,26 @@ const optRequestValidator = (req, res, next) => {
     return res.status(422).send({ message: "Please enter valid form step" });
   }
   next();
+};
+
+const hr_action_validator = (req, res, next) => {
+  const theStatus = req.body.status;
+  if (theStatus === "" || !theStatus) {
+    return res
+      .status(422)
+      .send({ message: "Please enter a status for update" });
+  }
+  if (theStatus !== "rejected" && theStatus !== "approved") {
+    return res
+      .status(422)
+      .send({ message: "Please enter a valid status (rejected/approved)" });
+  }
+  next();
+};
+
+const optRequestValidator = {
+  step_validator,
+  hr_action_validator,
 };
 
 export default optRequestValidator;
