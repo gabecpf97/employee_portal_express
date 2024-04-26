@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import { getUserInfo, editUserInfo } from "../controllers/UserController.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
-import applicationController from "../controllers/applicationController.js";
+import applicationController from "../controllers/ApplicationController.js";
 // import { login } from "../controllers/LoginController.js";
 // import { createUserValidation } from "../middlewares/RegistrationMiddleware.js";
 
