@@ -17,8 +17,6 @@ async function run() {
         await mongoose.connect(MONGO_URL,{dbName:"employee_db"});
         console.log("Connected to DB.");
 
-
-        // const admin = await User.create({username:"admin", password:"$argon2id$v=19$m=65536,t=3,p=4$qxHAx+vymtBvHaTKrpSVUQ$cAoJlZVZcBeM/vU/9MV4T1v1S1r/2l85TVbexGYiKyY",email:"admin@gmail.com", isAdmin:true,like:[]})
         const new_application = await Application.create(
             {
                 userId: "662add58af54f61b2a4c2a4c",
