@@ -1,5 +1,45 @@
 import Application from "../models/Application.js";
 
+// Allows HR to see a summary of each employee’s profile
+const application_getAll = async (req, res) => {
+  try {
+    const applications = await Application.find();
+
+    res.status(200).json({
+      length: applications.length,
+      applications,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// search for employees by first name, last name or preferred name
+const application_filter = async (req, res) => {
+  try {
+    const { firstName, lastName, preferredName } = req.query;
+
+    // Build the search query based on provided query params
+    const searchQuery = {};
+    if (firstName) {
+      searchQuery["firstName"] = { $regex: firstName, $options: "i" };
+    }
+    if (lastName) {
+      searchQuery["lastName"] = { $regex: lastName, $options: "i" };
+    }
+    if (preferredName) {
+      searchQuery["preferredName"] = { $regex: preferredName, $options: "i" };
+    }
+    const filteredApplications = await Application.find({ ...searchQuery });
+    res.status(200).json({
+      length: filteredApplications.length,
+      filteredApplications,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const application_get = async (req, res, next) => {
   try {
     const theApplication = await Application.findById(req.params.id);
@@ -64,6 +104,8 @@ const application_hr_update = async (req, res, next) => {
 };
 
 const applicationController = {
+  application_getAll,
+  application_filter,
   application_get,
   application_create,
   application_update,
