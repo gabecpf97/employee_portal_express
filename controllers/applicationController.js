@@ -61,11 +61,20 @@ const application_create = async (req, res, next) => {
     if (newApplication.workAuthorization.type === "f1opt") {
       const newOPt = new OPTRequest({
         userId: req.body.userId,
-        steps: "OPTReceipt",
+        step: "OPTReceipt",
         OPTReceipt: {
           status: "pending",
           document: newApplication.workAuthorization.document,
           feedback: "",
+        },
+        OPTEAD: {
+          status: "unuploaded",
+        },
+        I983: {
+          status: "unuploaded",
+        },
+        I20: {
+          status: "unuploaded",
         },
       });
       await newOPt.save();

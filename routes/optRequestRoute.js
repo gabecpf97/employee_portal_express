@@ -1,5 +1,5 @@
 import express from "express";
-import optController from "../controllers/OPTController";
+import optController from "../controllers/OPTController.js";
 const optRequestRouter = express.Router();
 
 optRequestRouter.put("/update/:id", optController.optrequest_update_doc);

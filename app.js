@@ -10,7 +10,7 @@ import authRoutes from "./routes/authRoute.js";
 import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
-
+import optRequestRouter from "./routes/optRequestRoute.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,17 +29,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/housing", housingRoutes);
 app.use("/application", applicationRouter);
+app.use("/optRequest", optRequestRouter);
 app.use("/", indexRouter);
 
 app.use((err, _req, res, _next) => {
   res.status(err.code);
   res.send({ message: err.message });
 });
-
 
 export default app;
