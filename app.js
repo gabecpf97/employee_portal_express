@@ -33,7 +33,7 @@ app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/housing", housingRoutes);
 app.use("/application", applicationRouter);
-app.use("/optRequest", optRequestRouter);
+app.use("/visa", optRequestRouter);
 app.use("/", indexRouter);
 
 app.use((err, _req, res, _next) => {
