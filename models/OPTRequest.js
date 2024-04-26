@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const refType = Schema.Types.ObjectId;
 
 const OPTRequestSchema = new Schema({
-  userId: { type: refType, ref: "Application" },
+  appId: { type: refType, ref: "Application" },
   step: { type: String, required: true }, //indicating which step user at "OPTReceipt" / "OPTEAD" / "I983" / "I20"
   OPTReceipt: {
     status: { type: String, required: true }, //unuploaded, pending, rejected, approved. Initiate to unuploaded

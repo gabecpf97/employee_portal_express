@@ -16,11 +16,11 @@ const optrequest_update_doc = async (req, res, next) => {
         const updateRequest = theOptRequest;
         updateRequest[theOptRequest.step] = {
           status: "pending",
-          document: req.body.docLink,
+          document: req.body.docLink, // link to the doc handle from file middleware
           feedback: "",
         };
         await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
-        res.status(200).send({ id: theOptRequest._id });
+        return res.status(200).send({ id: theOptRequest._id });
       }
     }
   } catch (err) {
@@ -28,17 +28,14 @@ const optrequest_update_doc = async (req, res, next) => {
   }
 };
 
-// send doc to HR frontend
+// send request by id
 const optrequest_get_id = async (req, res, next) => {
   try {
     const theOptRequest = await OPTRequest.findById(req.params.id);
     if (!theOptRequest) {
       return next({ code: 422, message: "No such OPT request" });
     } else {
-      res.status(200).send({
-        step: theOptRequest.step,
-        formObject: theOptRequest[theOptRequest.step],
-      });
+      return res.status(200).send({ request: theOptRequest });
     }
   } catch (err) {
     return next({ code: 500, message: err.message });
@@ -54,7 +51,7 @@ const optrequest_get_inProgress = async (req, res, next) => {
     if (theRequests.length < 1) {
       return next({ code: 422, message: "No such OPT requests" });
     } else {
-      res.status(200).send({ requests: theRequests });
+      return res.status(200).send({ requests: theRequests });
     }
   } catch (err) {
     return next({ code: 500, message: err.message });
@@ -65,7 +62,7 @@ const optrequest_get_inProgress = async (req, res, next) => {
 const optrequest_get_all = async (req, res, next) => {
   try {
     const theRequests = await OPTRequest.find({}).populate({
-      path: "userId",
+      path: "appId",
       select: "firstName lastName preferredName",
     });
     if (theRequests.length < 1) {
@@ -73,11 +70,11 @@ const optrequest_get_all = async (req, res, next) => {
     } else {
       const result = theRequests.filter(
         (request) =>
-          request.userId.firstName === req.query.name ||
-          request.userId.lastName === req.query.name ||
-          request.userId.preferredName === req.query.name
+          request.appId.firstName === req.query.name ||
+          request.appId.lastName === req.query.name ||
+          request.appId.preferredName === req.query.name
       );
-      res.status(200).send({ requests: result });
+      return res.status(200).send({ requests: result });
     }
   } catch (err) {
     return next({ err: 500, message: err.message });
@@ -96,6 +93,9 @@ const optrequest_hr_action = async (req, res, next) => {
         document: theRequest[theRequest.step].document,
         feedback: req.body.feedback,
       };
+      if (req.body.status === "approved") {
+        updateRequest.step = nextStep(theRequest.step);
+      }
       await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
       res.status(200).send({ id: updateRequest._id });
     }
@@ -110,9 +110,31 @@ const optrequest_hr_send_noti = async (req, res, next) => {
     if (!theRequest) {
       return next({ code: 422, message: "No such OPT request" });
     } else {
+      if (theRequest[theRequest.type].status === "unuploaded") {
+        // send email notifaction
+        const message = `Please upload document for ${theRequest.type}`;
+      }
+      // success sent
+      res.status(200).send({ sent: true });
     }
   } catch (err) {
     return next({ err: 500, message: err.message });
+  }
+};
+
+const nextStep = (curStep) => {
+  switch (curStep) {
+    case "OPTReceipt":
+      return "OPTEAD";
+
+    case "OPTEAD":
+      return "I983";
+
+    case "I983":
+      return "I20";
+
+    default:
+      return "I20";
   }
 };
 
@@ -122,6 +144,7 @@ const optController = {
   optrequest_get_inProgress,
   optrequest_get_all,
   optrequest_hr_action,
+  optrequest_hr_send_noti,
 };
 
 export default optController;
