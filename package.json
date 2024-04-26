@@ -18,7 +18,8 @@
     "mongoose": "^8.3.2",
     "morgan": "~1.9.1",
     "path": "^0.12.7",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
