@@ -1,12 +1,14 @@
 import express from "express";
 const router = express.Router();
 import {
-    createHousing,
-} from "../controllers/RegistrationController.js";
-// import { login } from "../controllers/LoginController.js";
-// import { createUserValidation } from "../middlewares/RegistrationMiddleware.js";
+    ShowUserHousing,
+    CreateHousing
+} from "../controllers/HousingController.js";
+import jwtValidation from "../middlewares/AuthMiddleware.js";
 
 
-router.post("/", createHousing);
+
+router.post("/", CreateHousing);
+router.get("/:housingId", ShowUserHousing)
 
 export default router;
