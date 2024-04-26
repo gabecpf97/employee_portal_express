@@ -1,5 +1,5 @@
 import express from "express";
-import applicationController from "../controllers/applicationController.js";
+import applicationController from "../controllers/ApplicationController.js";
 import applicationValidator from "../middlewares/ApplicationMiddleWare.js";
 import inputValidaton from "../middlewares/inputMiddleware.js";
 const applicationRouter = express.Router();
