@@ -20,8 +20,7 @@ optRequestRouter.put(
   optController.optrequest_hr_action
 );
 optRequestRouter.post(
-  "/:id/notifaction",
-  inputValidaton.bodyInputValid,
+  "/:id/notification",
   optController.optrequest_hr_send_noti
 );
 
