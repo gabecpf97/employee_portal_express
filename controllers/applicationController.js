@@ -1,17 +1,18 @@
 import Application from "../models/Application.js";
 import OPTRequest from "../models/OPTRequest.js";
+import User from "../models/User.js";
 
 // Allows HR to see a summary of each employee’s profile
 const application_getAll = async (req, res) => {
   try {
     const applications = await Application.find();
 
-    res.status(200).json({
+    return res.status(200).json({
       length: applications.length,
       applications,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return next({ code: 500, message: error.message });
   }
 };
 
@@ -32,7 +33,7 @@ const application_filter = async (req, res) => {
       searchQuery["preferredName"] = { $regex: preferredName, $options: "i" };
     }
     const filteredApplications = await Application.find({ ...searchQuery });
-    res.status(200).json({
+    return res.status(200).json({
       length: filteredApplications.length,
       filteredApplications,
     });
@@ -47,7 +48,7 @@ const application_get = async (req, res, next) => {
     if (!theApplication) {
       return next({ code: 422, message: "No such application" });
     } else {
-      res.status(200).send({ application: theApplication });
+      return res.status(200).send({ application: theApplication });
     }
   } catch (err) {
     return next({ code: 500, message: err.message });
@@ -56,11 +57,17 @@ const application_get = async (req, res, next) => {
 
 const application_create = async (req, res, next) => {
   try {
+    const theApplication = await Application.findOne({
+      userId: req.body.application.userId,
+    });
+    if (theApplication) {
+      return next({ code: 200, message: "Already created application" });
+    }
     const newApplication = new Application(req.body.application);
     // create new opt request if select f1opt
     if (newApplication.workAuthorization.type === "f1opt") {
       const newOPt = new OPTRequest({
-        userId: req.body.userId,
+        appId: newApplication._id,
         step: "OPTReceipt",
         OPTReceipt: {
           status: "pending",
@@ -80,7 +87,12 @@ const application_create = async (req, res, next) => {
       await newOPt.save();
     }
     await newApplication.save();
-    res.status(200).send({ id: newApplication._id });
+    await User.findByIdAndUpdate(
+      newApplication.userId,
+      { applicationId: newApplication._id, status: "pending" },
+      {}
+    );
+    return res.status(200).send({ id: newApplication._id });
   } catch (err) {
     return next({ code: 500, message: err.message });
   }
@@ -101,7 +113,7 @@ const application_update = async (req, res, next) => {
         updatedApplication,
         {}
       );
-      res.status(200).send({ id: theApplication._id });
+      return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {
     return next({ code: 500, message: err.message });

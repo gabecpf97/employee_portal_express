@@ -1,12 +1,33 @@
 import express from "express";
 const router = express.Router();
 import {
-    createHousing,
-} from "../controllers/RegistrationController.js";
-// import { login } from "../controllers/LoginController.js";
-// import { createUserValidation } from "../middlewares/RegistrationMiddleware.js";
+  ShowUserHousing,
+  CreateHousing,
+  DeleteHousing,
+  ShowAllHousing,
+} from "../controllers/HousingController.js";
+import { jwtValidation } from "../middlewares/AuthMiddleware.js";
+import {
+    CreateFacilityReport,
+    ShowUserFacilityReports,
+    GetSingleFacilityReport,
+    PostCommentToReport,
+    GetSingleFacilityComments,
+} from "../controllers/FacilityReportController.js";
 
 
-router.post("/", createHousing);
+//HousingController
+router.post("/", jwtValidation, CreateHousing);
+router.get("/", jwtValidation, ShowAllHousing);
+router.get("/:housingId", jwtValidation, ShowUserHousing);
+router.delete("/:housingId", jwtValidation, DeleteHousing);
+
+//FacilitiesController
+router.post("/reports", jwtValidation, CreateFacilityReport);
+router.get("/reports/all", jwtValidation, ShowUserFacilityReports);
+router.get("/reports/:reportId", jwtValidation, GetSingleFacilityReport);
+router.post("/reports/:reportId/comments", jwtValidation, PostCommentToReport )
+router.get("/reports/:reportId/comments", jwtValidation, GetSingleFacilityComments )
+
 
 export default router;
