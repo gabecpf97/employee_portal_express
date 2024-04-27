@@ -42,6 +42,22 @@ const application_filter = async (req, res) => {
   }
 };
 
+//search for applications of certain status
+const application_status = async (req, res) => {
+  try {
+    const status = req.query.status;
+    console.log(status)
+    
+    const filteredApplications = await Application.find({status:status});
+    return res.status(200).json({
+      length: filteredApplications.length,
+      filteredApplications,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const application_get = async (req, res, next) => {
   try {
     const theApplication = await Application.findById(req.params.id);
@@ -145,6 +161,7 @@ const applicationController = {
   application_create,
   application_update,
   application_hr_update,
+  application_status
 };
 
 export default applicationController;
