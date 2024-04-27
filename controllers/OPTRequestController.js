@@ -1,4 +1,6 @@
 import OPTRequest from "../models/OPTRequest.js";
+import sendEmail from "../utils/handleEmail.js";
+import emailjs from "../utils/handleEmail.js";
 
 // receive document from employee frontend to update status and return status
 const optrequest_update_doc = async (req, res, next) => {
@@ -106,19 +108,30 @@ const optrequest_hr_action = async (req, res, next) => {
 
 const optrequest_hr_send_noti = async (req, res, next) => {
   try {
-    const theRequest = await OPTRequest.findById(req.params.id);
+    const theRequest = await OPTRequest.findById(req.params.id).populate({
+      path: "appId",
+      select: "email",
+    });
     if (!theRequest) {
       return next({ code: 422, message: "No such OPT request" });
     } else {
-      if (theRequest[theRequest.type].status === "unuploaded") {
-        // send email notifaction
-        const message = `Please upload document for ${theRequest.type}`;
+      if (theRequest[theRequest.step].status === "unuploaded") {
+        const info = await sendEmail(theRequest.step, theRequest.appId.email);
+        if (info.status) {
+          return res.status(200).send({ message: "sent" });
+        } else {
+          return next({ code: 422, message: "Sent email failed" });
+        }
+      } else {
+        return next({
+          code: 400,
+          message: "File already exists for current step",
+        });
       }
-      // success sent
-      res.status(200).send({ sent: true });
     }
   } catch (err) {
-    return next({ err: 500, message: err.message });
+    console.log(err);
+    return next({ err: 500, message: err.message | err.response });
   }
 };
 
