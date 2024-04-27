@@ -84,6 +84,7 @@ const GetSingleFacilityReport = async (req, res) => {
     }
 }
 
+//Comments controllers
 const PostCommentToReport = async (req, res) => {
     const reportId = req.params.reportId;
     const userId = req.body.userId;
