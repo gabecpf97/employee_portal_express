@@ -116,7 +116,7 @@ const PostCommentToReport = async (req, res) => {
 
 const GetSingleFacilityComments = async (req, res) => {
     const reportId = req.params.reportId;
-    // console.log(reportId)
+
     try {
         const report = await FacilityReport.findById(reportId);
         if (!report) {
