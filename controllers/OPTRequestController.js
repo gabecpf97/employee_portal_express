@@ -1,5 +1,5 @@
+import transporter from "../config/email.js";
 import OPTRequest from "../models/OPTRequest.js";
-// import transporter from "../utils/handleEmail.js";
 
 // receive document from employee frontend to update status and return status
 const optrequest_update_doc = async (req, res, next) => {
@@ -121,15 +121,14 @@ const optrequest_hr_send_noti = async (req, res, next) => {
           subject: "HR portal notification",
           text: `Please upload form for ${theRequest.step}`,
         };
-        // const info = await transporter.sendMail(mailOption);
-        // if (info.response) {
-        //   return res
-        //     .status(200)
-        //     .send({ message: `sent id: ${info.messageId}` });
-        // } else {
-        //   return next({ code: 422, message: "Sent email failed" });
-        // }
-        return res.status(200);
+        const info = await transporter.sendMail(mailOption);
+        if (info.response) {
+          return res
+            .status(200)
+            .send({ message: `sent id: ${info.messageId}` });
+        } else {
+          return next({ code: 422, message: "Sent email failed" });
+        }
       } else {
         return next({
           code: 400,
