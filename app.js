@@ -11,7 +11,7 @@ import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 import optRequestRouter from "./routes/optRequestRoute.js";
-import hiringRoutes from "./routes/hiringRoute.js"
+import hiringRoutes from "./routes/hiringRoute.js";
 
 import cors from "cors";
 
@@ -34,6 +34,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors({
   origin: "http://localhost:5173"
 }))
+
+// for testing AWS middlewares
+// import {
+//   uploadImageToMulter,
+//   saveToAWS,
+//   retrieveImageUrl,
+// } from "./middlewares/AWSMiddleware.js";
+// app.post("/api/posts", uploadImageToMulter, saveToAWS);
+// app.get("/api/posts", retrieveImageUrl);
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
