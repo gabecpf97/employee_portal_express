@@ -7,7 +7,6 @@ const HiringSchema = new Schema({
     name: { type: String, required: true },
     link: { type: String, required: true },
     status: { type: String, required: true , default: "sent"}, //sent, used, expired
-    
 });
 
 const Hiring = mongoose.model("Hiring", HiringSchema, "Hiring");
