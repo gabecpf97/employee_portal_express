@@ -11,6 +11,7 @@ import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 import optRequestRouter from "./routes/optRequestRoute.js";
+import hiringRoutes from "./routes/hiringRoute.js"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +35,7 @@ app.use("/auth", authRoutes);
 app.use("/housing", housingRoutes);
 app.use("/application", applicationRouter);
 app.use("/visa", optRequestRouter);
+app.use("/hiring", hiringRoutes);
 app.use("/", indexRouter);
 
 app.use((err, _req, res, _next) => {
