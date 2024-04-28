@@ -6,7 +6,6 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import Application from "../models/Application.js";
 
 const S3 = new S3Client({
   region: process.env.BUCKET_REGION,
@@ -16,48 +15,94 @@ const S3 = new S3Client({
   },
 });
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-const uploadImageToMulter = upload.single("image");
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Not an image! Please upload only images!", 400), false);
+  }
+};
+const upload = multer({ storage: storage, fileFilter: multerFilter });
+const uploadImageToMulter = upload.fields([
+  { name: "picture", maxCount: 1 },
+  { name: "driverLicense_document", maxCount: 1 },
+  { name: "workAuthorization_document", maxCount: 1 },
+]);
 
 const generateFileName = (bytes = 16) =>
   crypto.randomBytes(bytes).toString("hex");
 
 const saveToAWS = async (req, res, next) => {
   try {
-    const imageName = generateFileName();
-    const params = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: imageName,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
+    const paramss = [];
+    const keys = {
+      picture: "picture_" + generateFileName(),
+      DriverLicense: "driverLicense_" + generateFileName(),
+      WorkAuthorization: "workAuthorization_" + generateFileName(),
     };
 
-    const command = new PutObjectCommand(params);
-    await S3.send(command);
-    req.body.imageName = imageName;
+    const file1 = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: "picture_" + generateFileName(),
+      Body: req.files.picture[0].buffer,
+      ContentType: req.files.picture[0].mimetype,
+    };
+    const file2 = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: "driverLicense_" + generateFileName(),
+      Body: req.files.driverLicense_document[0].buffer,
+      ContentType: req.files.driverLicense_document[0].mimetype,
+    };
+    const file3 = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: "workAuthorization_" + generateFileName(),
+      Body: req.files.workAuthorization_document[0].buffer,
+      ContentType: req.files.workAuthorization_document[0].mimetype,
+    };
 
-    // save image name to the application
-    const theApplication = await Application.findById(
-      "662aeb4c0b4690ff3dc9f4b2"
+    paramss.push(file1);
+    paramss.push(file2);
+    paramss.push(file3);
+
+    await Promise.all(
+      paramss.map((param) => {
+        const command = new PutObjectCommand(param);
+        S3.send(command);
+      })
     );
-    if (!theApplication) {
-      return res.status(400).json({
-        message: "Application not found!",
-      });
-    }
-    theApplication.workAuthorization.document = imageName;
-    await Application.findByIdAndUpdate(
-      "662aeb4c0b4690ff3dc9f4b2",
-      theApplication
-    );
-    res.status(200).json({
-      status: "success",
-      imageName,
-      file: req.file,
-    });
+
+    req.body.s3Keys = keys;
+    next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
+};
+
+const convertFormDataToJson = (req, res, next) => {
+  const { s3Keys } = req.body;
+  const applicationData = {
+    ...req.body,
+    address: JSON.parse(req.body.address),
+    car: JSON.parse(req.body.car),
+    reference: JSON.parse(req.body.reference),
+    emergency: JSON.parse(req.body.emergency),
+    picture: s3Keys.picture,
+    driverLicense: {
+      number: req.body.driverLicense_number,
+      expirationDate: req.body.driverLicense_expirationDate,
+      document: s3Keys.DriverLicense,
+    },
+    workAuthorization: {
+      type: req.body.workAuthorization_type,
+      document: s3Keys.WorkAuthorization,
+      startDate: req.body.workAuthorization_startDate,
+      endDate: req.body.workAuthorization_endDate,
+    },
+  };
+
+  req.body.application = applicationData;
+  next();
 };
 
 const retrieveImageUrl = async (req, res, next) => {
@@ -81,4 +126,9 @@ const retrieveImageUrl = async (req, res, next) => {
   }
 };
 
-export { uploadImageToMulter, saveToAWS, retrieveImageUrl };
+export {
+  uploadImageToMulter,
+  saveToAWS,
+  convertFormDataToJson,
+  retrieveImageUrl,
+};
