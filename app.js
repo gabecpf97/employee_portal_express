@@ -35,13 +35,12 @@ app.use(cors({
   origin: "http://localhost:5173"
 }))
 
-// for testing AWS middlewares
+// for testing retrieveImageUrl
 // import {
 //   uploadImageToMulter,
 //   saveToAWS,
 //   retrieveImageUrl,
 // } from "./middlewares/AWSMiddleware.js";
-// app.post("/api/posts", uploadImageToMulter, saveToAWS);
 // app.get("/api/posts", retrieveImageUrl);
 
 app.use("/users", userRoutes);
