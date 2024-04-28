@@ -11,7 +11,7 @@ import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 import optRequestRouter from "./routes/optRequestRoute.js";
-import hiringRoutes from "./routes/hiringRoute.js"
+import hiringRoutes from "./routes/hiringRoute.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,6 +29,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// for testing AWS middlewares
+// import {
+//   uploadImageToMulter,
+//   saveToAWS,
+//   retrieveImageUrl,
+// } from "./middlewares/AWSMiddleware.js";
+// app.post("/api/posts", uploadImageToMulter, saveToAWS);
+// app.get("/api/posts", retrieveImageUrl);
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
