@@ -1,6 +1,5 @@
 import OPTRequest from "../models/OPTRequest.js";
-import sendEmail from "../utils/handleEmail.js";
-import emailjs from "../utils/handleEmail.js";
+// import transporter from "../utils/handleEmail.js";
 
 // receive document from employee frontend to update status and return status
 const optrequest_update_doc = async (req, res, next) => {
@@ -116,12 +115,21 @@ const optrequest_hr_send_noti = async (req, res, next) => {
       return next({ code: 422, message: "No such OPT request" });
     } else {
       if (theRequest[theRequest.step].status === "unuploaded") {
-        const info = await sendEmail(theRequest.step, theRequest.appId.email);
-        if (info.status) {
-          return res.status(200).send({ message: "sent" });
-        } else {
-          return next({ code: 422, message: "Sent email failed" });
-        }
+        const mailOption = {
+          from: process.env.HR_EMAIL,
+          to: theRequest.appId.email,
+          subject: "HR portal notification",
+          text: `Please upload form for ${theRequest.step}`,
+        };
+        // const info = await transporter.sendMail(mailOption);
+        // if (info.response) {
+        //   return res
+        //     .status(200)
+        //     .send({ message: `sent id: ${info.messageId}` });
+        // } else {
+        //   return next({ code: 422, message: "Sent email failed" });
+        // }
+        return res.status(200);
       } else {
         return next({
           code: 400,
