@@ -46,9 +46,9 @@ const application_filter = async (req, res) => {
 const application_status = async (req, res) => {
   try {
     const status = req.query.status;
-    console.log(status)
-    
-    const filteredApplications = await Application.find({status:status});
+    console.log(status);
+
+    const filteredApplications = await Application.find({ status: status });
     return res.status(200).json({
       length: filteredApplications.length,
       filteredApplications,
@@ -161,7 +161,7 @@ const applicationController = {
   application_create,
   application_update,
   application_hr_update,
-  application_status
+  application_status,
 };
 
 export default applicationController;
