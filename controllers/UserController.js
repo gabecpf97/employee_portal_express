@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Application from "../models/Application.js";
+import argon2 from 'argon2';
 // import * as argon2 from "argon2";
 // import generateToken from "../utils/generateToken.js";
 
@@ -48,12 +49,12 @@ const getUserInfo = async (req, res) => {
 };
 
 const editUserInfo = async (req, res) => {
-  try {
-    // get credentials from body
-    console.log("in put");
-    const target_userId = req.params.userid;
-    const { userId, username, updateData } = req.body;
-    const req_userId = userId;
+    try {
+        // get credentials from body
+        console.log("in put")
+        const target_userId = req.params.userid;
+        const { userId , username , new_username, new_email, new_password, updateData} = req.body;
+        const req_userId = userId
 
     // check if the sender exists
     const sender = await User.findOne({ _id: req_userId });
@@ -86,11 +87,20 @@ const editUserInfo = async (req, res) => {
       });
     }
 
-    const updatedProfile = await Application.findByIdAndUpdate(
-      profile._id,
-      updateData,
-      { new: true }
-    );
+        //update application document
+        const updatedProfile = await Application.findByIdAndUpdate(profile._id, updateData, { new: true });
+
+        //update user document
+        if(new_username){
+            const updatedUsername = await User.findByIdAndUpdate(target_userId, {username:new_username},{ new: true })
+        }
+        if(new_email){
+            const updatedEmail = await User.findByIdAndUpdate(target_userId, {email:new_email},{ new: true })
+        }
+        if(new_password){
+            const hashedPassword = await argon2.hash(new_password);
+            const updatedPassword = await User.findByIdAndUpdate(target_userId, {password:hashedPassword},{ new: true })
+        }
 
     return res
       .status(200)
@@ -100,4 +110,6 @@ const editUserInfo = async (req, res) => {
   }
 };
 
-export { getUserInfo, editUserInfo };
+
+
+export { getUserInfo, editUserInfo};
