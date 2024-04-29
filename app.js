@@ -12,6 +12,7 @@ import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 import optRequestRouter from "./routes/optRequestRoute.js";
 import hiringRoutes from "./routes/hiringRoute.js";
+import cors from "cors";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,6 +30,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+//added cors to allow cross origin requests
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
 
 // for testing retrieveImageUrl
 // import {
