@@ -9,8 +9,8 @@ import userRoutes from "./routes/userRoute.js";
 import authRoutes from "./routes/authRoute.js";
 import housingRoutes from "./routes/housingRoute.js";
 import connection from "./config/db.js";
-import applicationRouter from "./routes/applicationRoute.js";
-import optRequestRouter from "./routes/optRequestRoute.js";
+import applicationRoutes from "./routes/applicationRoute.js";
+import optRequestRoutes from "./routes/optRequestRoute.js";
 import hiringRoutes from "./routes/hiringRoute.js";
 import cors from "cors";
 
@@ -47,8 +47,8 @@ app.use(cors({
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/housing", housingRoutes);
-app.use("/application", applicationRouter);
-app.use("/visa", optRequestRouter);
+app.use("/application", applicationRoutes);
+app.use("/visa", optRequestRoutes);
 app.use("/hiring", hiringRoutes);
 app.use("/", indexRouter);
 
