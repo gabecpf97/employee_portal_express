@@ -12,6 +12,8 @@ import connection from "./config/db.js";
 import applicationRouter from "./routes/applicationRoute.js";
 import optRequestRouter from "./routes/optRequestRoute.js";
 
+import cors from "cors";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -28,6 +30,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors({
+  origin: "http://localhost:5173"
+}))
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
