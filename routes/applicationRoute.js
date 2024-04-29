@@ -21,6 +21,7 @@ applicationRouter.get("/:id", applicationController.application_get);
 // need token auth
 applicationRouter.post(
   "/create",
+  jwtValidation,
   uploadImageToMulter,
   saveToAWS,
   convertFormDataToJson,
@@ -31,6 +32,7 @@ applicationRouter.post(
 
 applicationRouter.put(
   "/update/:id",
+  jwtValidation,
   inputValidaton.applicationFieldValidation,
   applicationValidator,
   applicationController.application_update
@@ -38,6 +40,8 @@ applicationRouter.put(
 // need a middleware for checking isHR
 applicationRouter.put(
   "/hr/update/:id",
+  jwtValidation,
+  restrictToHR,
   applicationController.application_hr_update
 );
 
