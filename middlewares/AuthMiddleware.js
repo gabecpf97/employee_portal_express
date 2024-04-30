@@ -4,6 +4,7 @@ import User from "../models/User.js";
 
 const jwtValidation = (req, res, next) => {
   try{
+    console.log("in jwt validation")
     const token = req.headers.authorization.split(" ")[1];
     if (!token || validator.isEmpty(token)) {
       return res.status(401).json({

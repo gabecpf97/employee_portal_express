@@ -30,18 +30,29 @@ const uploadImageToMulter = upload.fields([
   { name: "workAuthorization_document", maxCount: 1 },
 ]);
 
+const uploadImageToMulterSafe = (req, res, next) => {
+  console.log("in safe")
+  uploadImageToMulter(req, res, (err) => {
+      if (err) {
+          return res.status(400).json({ message: err.message });
+      }
+      next();
+  });
+};
+
 const generateFileName = (bytes = 16) =>
   crypto.randomBytes(bytes).toString("hex");
 
 const saveToAWS = async (req, res, next) => {
   try {
+    console.log("in save to aws")
     const paramss = [];
     const keys = {
       picture: "picture_" + generateFileName(),
       DriverLicense: "driverLicense_" + generateFileName(),
       WorkAuthorization: "workAuthorization_" + generateFileName(),
     };
-
+    
     const file1 = {
       Bucket: process.env.BUCKET_NAME,
       Key: "picture_" + generateFileName(),
@@ -80,29 +91,34 @@ const saveToAWS = async (req, res, next) => {
 };
 
 const convertFormDataToJson = (req, res, next) => {
-  const { s3Keys } = req.body;
-  const applicationData = {
-    ...req.body,
-    address: JSON.parse(req.body.address),
-    car: JSON.parse(req.body.car),
-    reference: JSON.parse(req.body.reference),
-    emergency: JSON.parse(req.body.emergency),
-    picture: s3Keys.picture,
-    driverLicense: {
-      number: req.body.driverLicense_number,
-      expirationDate: req.body.driverLicense_expirationDate,
-      document: s3Keys.DriverLicense,
-    },
-    workAuthorization: {
-      type: req.body.workAuthorization_type,
-      document: s3Keys.WorkAuthorization,
-      startDate: req.body.workAuthorization_startDate,
-      endDate: req.body.workAuthorization_endDate,
-    },
-  };
+  try{
+    const { s3Keys } = req.body;
+    console.log(req.body)
+    const applicationData = {
+      ...req.body,
+      address: JSON.parse(req.body.address),
+      car: JSON.parse(req.body.car),
+      reference: JSON.parse(req.body.reference),
+      emergency: JSON.parse(req.body.emergency),
+      picture: s3Keys.picture,
+      driverLicense: {
+        number: req.body.driverLicense_number,
+        expirationDate: req.body.driverLicense_expirationDate,
+        document: s3Keys.DriverLicense,
+      },
+      workAuthorization: {
+        type: req.body.workAuthorization_type,
+        document: s3Keys.WorkAuthorization,
+        startDate: req.body.workAuthorization_startDate,
+        endDate: req.body.workAuthorization_endDate,
+      },
+    };
 
-  req.body.application = applicationData;
-  next();
+    req.body.application = applicationData;
+    next();
+  } catch(err){
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 const retrieveImageUrl = async (req, res, next) => {
@@ -127,7 +143,7 @@ const retrieveImageUrl = async (req, res, next) => {
 };
 
 export {
-  uploadImageToMulter,
+  uploadImageToMulterSafe,
   saveToAWS,
   convertFormDataToJson,
   retrieveImageUrl,

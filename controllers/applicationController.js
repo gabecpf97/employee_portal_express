@@ -122,13 +122,15 @@ const application_update = async (req, res, next) => {
     } else {
       const updatedApplication = req.body.application;
       updatedApplication.userId = theApplication.userId;
-      updatedApplication.status = theApplication.status;
+      updatedApplication.status = theApplication.status==="approved"?"approved":"pending";
       updatedApplication.feedback = theApplication.feedback;
       await Application.findByIdAndUpdate(
         req.params.id,
         updatedApplication,
         {}
       );
+
+      await User.findOneAndUpdate({_id:updatedApplication.userId},{status:theApplication.status==="approved"?"approved":"pending"})
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {
