@@ -18,6 +18,11 @@ const CreateFacilityReport = async (req, res) => {
 
         //create a new facility report
         const { title, description } = req.body;
+        if(!title || !description){
+            res.status(400).send({
+                message: "Facility report needs title and description!",
+            });
+        }
         const newFacilityReport = new FacilityReport({
             housingId : user.housingId,
             title: title,
@@ -25,8 +30,7 @@ const CreateFacilityReport = async (req, res) => {
             createdBy: userId,
             timestamp: Date.now(),
             status: "open",
-            comments: [],
-            residentIds: housingInfo.residentIds,
+            comments: []
         });
         newFacilityReport.save();
         
@@ -89,6 +93,11 @@ const PostCommentToReport = async (req, res) => {
     const reportId = req.params.reportId;
     const userId = req.body.userId;
     const description = req.body.description;
+    if(!description){
+        return res.status(400).send({
+            message: "Please input comment description"
+        });
+    }
     const newComment = {
         description: description,
         createdBy: userId,

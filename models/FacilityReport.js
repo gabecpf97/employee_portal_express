@@ -13,8 +13,7 @@ const FacilityReportSchema = new Schema({
         description: { type: String, required: true },
         createdBy: { type: refType, ref:"User" },
         timestamp: { type: String, required: true }
-    }], 
-    residentIds: [{ type: refType, ref:"User" }],
+    }]
 });
 
 const FacilityReport = mongoose.model("FacilityReport", FacilityReportSchema, "FacilityReport");
