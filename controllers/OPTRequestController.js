@@ -1,5 +1,24 @@
 import transporter from "../config/email.js";
 import OPTRequest from "../models/OPTRequest.js";
+import Application from "../models/Application.js";
+
+const get_optId_by_applicationId = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const application = await Application.findOne({userId:userId})
+    const opt_request = await OPTRequest.findOne({appId:application._id})
+
+    if(!opt_request){
+      return res.status(400).send({ message:"User does not have OPT request submitted" });
+    }
+
+    return res.status(200).json({
+      requestId : opt_request._id
+    });
+  } catch (error) {
+    return next({ code: 500, message: error.message });
+  }
+};
 
 // receive document from employee frontend to update status and return status
 const optrequest_update_doc = async (req, res, next) => {
@@ -17,7 +36,7 @@ const optrequest_update_doc = async (req, res, next) => {
         const updateRequest = theOptRequest;
         updateRequest[theOptRequest.step] = {
           status: "pending",
-          document: req.body.docLink, // link to the doc handle from file middleware
+          document: req.body.document, // link to the doc handle from file middleware
           feedback: "",
         };
         await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
@@ -165,6 +184,7 @@ const optController = {
   optrequest_get_all,
   optrequest_hr_action,
   optrequest_hr_send_noti,
+  get_optId_by_applicationId
 };
 
 export default optController;

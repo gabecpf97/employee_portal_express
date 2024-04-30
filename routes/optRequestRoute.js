@@ -3,7 +3,18 @@ import optController from "../controllers/OPTRequestController.js";
 import optRequestValidator from "../middlewares/OPTRequestMiddleware.js";
 import inputValidaton from "../middlewares/inputMiddleware.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
+import {
+  convertFormDataToJson,
+  saveToAWS,
+  uploadImageToMulterSafe,
+} from "../middlewares/AWSOPTMiddleware.js";
 const optRequestRouter = express.Router();
+
+optRequestRouter.get(
+  "/getRequestId",
+  jwtValidation,
+  optController.get_optId_by_applicationId
+);
 
 optRequestRouter.get(
   "/",
@@ -18,13 +29,25 @@ optRequestRouter.get(
   optController.optrequest_get_inProgress
 );
 optRequestRouter.get("/:id", jwtValidation, optController.optrequest_get_id);
+
+// optRequestRouter.put(
+//   "/:id",
+//   jwtValidation,
+//   inputValidaton.bodyInputValid,
+//   optRequestValidator.step_validator,
+//   optController.optrequest_update_doc
+// );
+
 optRequestRouter.put(
   "/:id",
   jwtValidation,
+  uploadImageToMulterSafe,
+  saveToAWS,
+  convertFormDataToJson,
   inputValidaton.bodyInputValid,
-  optRequestValidator.step_validator,
   optController.optrequest_update_doc
 );
+
 optRequestRouter.put(
   "/:id/action",
   jwtValidation,
