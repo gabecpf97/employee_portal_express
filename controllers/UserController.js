@@ -35,14 +35,14 @@ const getUserInfo = async (req, res) => {
     }
 
     //get user profile
-    const profile = await Application.findOne({ userId: target_userId });
-    if (!profile || profile.status !== "approved") {
+    const application = await Application.findOne({ userId: target_userId });
+    if (!application) {
       return res.status(400).json({
-        message: "User has not passed onboarding!",
+        message: "User has not submit an application!",
       });
     }
 
-    return res.status(200).json({ profile, user });
+    return res.status(200).json({ application, user });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -110,6 +110,25 @@ const editUserInfo = async (req, res) => {
   }
 };
 
+const getUserStatus = async (req, res) => {
+    try {
+      // get credentials from token
+        const { userId } = req.body;
+
+      // check if the user exists
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(401).json({
+            message: "user not found!",
+        });
+        }
+
+        return res.status(200).json({ status:user.status });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 
 
-export { getUserInfo, editUserInfo};
+
+export { getUserInfo, editUserInfo, getUserStatus};

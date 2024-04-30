@@ -6,7 +6,7 @@ import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
   convertFormDataToJson,
   saveToAWS,
-  uploadImageToMulter,
+  uploadImageToMulterSafe,
 } from "../middlewares/AWSMiddleware.js";
 const applicationRouter = express.Router();
 
@@ -18,11 +18,12 @@ applicationRouter.get(
 );
 
 applicationRouter.get("/:id", applicationController.application_get);
+
 // need token auth
 applicationRouter.post(
   "/create",
-  jwtValidation,
-  uploadImageToMulter,
+  jwtValidation, //id and username will be added
+  uploadImageToMulterSafe,
   saveToAWS,
   convertFormDataToJson,
   inputValidaton.applicationFieldValidation,
@@ -33,6 +34,9 @@ applicationRouter.post(
 applicationRouter.put(
   "/update/:id",
   jwtValidation,
+  uploadImageToMulterSafe,
+  saveToAWS,
+  convertFormDataToJson,
   inputValidaton.applicationFieldValidation,
   applicationValidator,
   applicationController.application_update
