@@ -4,7 +4,10 @@ import User from '../models/User.js';
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
     try {
-        const houseInfo = await Housing.findById(housingId);
+        const houseInfo = await Housing.findById(housingId).populate('residentIds');
+        if(!houseInfo){
+            return res.status(404).send({ message: "housing does noe exist"})
+        }
         return res.status(200).send({ houseInfo})
     } catch (error) {
         return res.status(401).send({
