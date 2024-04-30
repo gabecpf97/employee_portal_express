@@ -3,6 +3,8 @@ import validator from "validator";
 import User from "../models/User.js";
 
 const jwtValidation = (req, res, next) => {
+  //console.log("in JWT")
+
   try{
     console.log("in jwt validation")
     const token = req.headers.authorization.split(" ")[1];
@@ -33,6 +35,7 @@ const jwtValidation = (req, res, next) => {
 
 // check whether the user is HR
 const restrictToHR = async (req, res, next) => {
+  //console.log("in restrict HR")
   const userId = req.body.userId;
   try {
     const user = await User.findOne({ _id: userId });

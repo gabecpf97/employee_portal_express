@@ -5,7 +5,7 @@ import User from "../models/User.js";
 // Allows HR to see a summary of each employee’s profile
 const application_getAll = async (req, res) => {
   try {
-    const applications = await Application.find();
+    const applications = await Application.find({status:"approved"});
 
     return res.status(200).json({
       length: applications.length,

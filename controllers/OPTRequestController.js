@@ -1,6 +1,7 @@
 import transporter from "../config/email.js";
 import OPTRequest from "../models/OPTRequest.js";
 import Application from "../models/Application.js";
+import containsIgnoreCase from "../utils/regularExpression.js";
 
 const get_optId_by_applicationId = async (req, res) => {
   try {
@@ -81,23 +82,42 @@ const optrequest_get_inProgress = async (req, res, next) => {
 // get all visa request
 const optrequest_get_all = async (req, res, next) => {
   try {
+
     const theRequests = await OPTRequest.find({}).populate({
       path: "appId",
-      select: "firstName lastName preferredName",
+      select: "firstName lastName prefferedName workAuthorization",
     });
+    console.log(theRequests)
     if (theRequests.length < 1) {
-      return next({ code: 422, message: "No OPT request" });
+      return res.status(200).send({ requests: [] });
     } else {
-      const result = theRequests.filter(
-        (request) =>
-          request.appId.firstName === req.query.name ||
-          request.appId.lastName === req.query.name ||
-          request.appId.preferredName === req.query.name
+      // const result = theRequests.filter(
+      //   (request) =>
+      //     request.appId.firstName === req.query.name ||
+      //     request.appId.lastName === req.query.name ||
+      //     request.appId.preferredName === req.query.name
+      // );
+       const result = theRequests.filter(
+        (request) => {
+          if(!request.appId){
+            return false
+          }
+          if(req.query.firstName && !containsIgnoreCase(request.appId.firstName, req.query.firstName)){
+            return false
+          }
+          if(req.query.lastName && !containsIgnoreCase(request.appId.lastName, req.query.lastName)){
+            return false
+          }
+          if(request.appId.preferredName && req.query.preferredName && !containsIgnoreCase(request.appId.preferredName, req.query.preferredName)){
+            return false
+          }
+          return true
+        }
       );
       return res.status(200).send({ requests: result });
     }
   } catch (err) {
-    return next({ err: 500, message: err.message });
+    return res.status(500).send({ message:err.message });
   }
 };
 
@@ -111,7 +131,7 @@ const optrequest_hr_action = async (req, res, next) => {
       updateRequest[theRequest.step] = {
         status: req.body.status,
         document: theRequest[theRequest.step].document,
-        feedback: req.body.feedback,
+        feedback: req.body.feedback?req.body.feedback:"",
       };
       if (req.body.status === "approved") {
         updateRequest.step = nextStep(theRequest.step);
