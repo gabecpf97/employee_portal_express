@@ -53,7 +53,7 @@ const editUserInfo = async (req, res) => {
         // get credentials from body
         console.log("in put")
         const target_userId = req.params.userid;
-        const { userId , username , new_username, new_email, new_password, updateData} = req.body;
+        const { userId , username , new_username, new_email, new_password} = req.body;
         const req_userId = userId
 
     // check if the sender exists
@@ -87,15 +87,13 @@ const editUserInfo = async (req, res) => {
       });
     }
 
-        //update application document
-        const updatedProfile = await Application.findByIdAndUpdate(profile._id, updateData, { new: true });
-
         //update user document
         if(new_username){
             const updatedUsername = await User.findByIdAndUpdate(target_userId, {username:new_username},{ new: true })
         }
         if(new_email){
             const updatedEmail = await User.findByIdAndUpdate(target_userId, {email:new_email},{ new: true })
+            const updatedProfile = await Application.findByIdAndUpdate(profile._id, {email:new_email}, { new: true });
         }
         if(new_password){
             const hashedPassword = await argon2.hash(new_password);
