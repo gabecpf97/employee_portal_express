@@ -63,6 +63,20 @@ const saveToAWS = async (req, res, next) => {
       })
     );
 
+    const retrieveParams = [];
+    for (let i = 0; i < keys.length; i++) {
+      retrieveParams.push({
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys[i],
+      });
+    }
+
+    for (let i = 0; i < keys.length; i++) {
+      const command = new GetObjectCommand(retrieveParams[i]);
+      const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
+      keys[i] = url;
+    }
+
     req.body.keys = keys;
     next();
   } catch (error) {
@@ -98,7 +112,8 @@ const retrieveImageUrl = async (req, res, next) => {
     };
 
     const command = new GetObjectCommand(params);
-    const document = await getSignedUrl(S3, command, { expiresIn: 3600 });
+    const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
+    const document = url.split("?")[0];
     // res.status(200).json({
     //   status: "success",
     //   url,
