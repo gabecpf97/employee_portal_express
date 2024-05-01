@@ -22,7 +22,7 @@ const sendHiringLink = async (req, res) => {
     //get user email and username
     const {email, name} = req.body
     const registration_token = generateRegistration(email,name)
-    const registration_link = `TMP/PLACEHOLDER/URL?token=${registration_token}`
+    const registration_link = `http://localhost:5173/registration/${registration_token}`
     console.log("registration link: ",registration_link)
 
     //send email to user

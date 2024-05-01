@@ -6,7 +6,7 @@ const ShowUserHousing = async (req, res) => {
     try {
         const houseInfo = await Housing.findById(housingId).populate('residentIds');
         if(!houseInfo){
-            return res.status(404).send({ message: "housing does noe exist"})
+            return res.status(404).send({ message: "housing does not exist"})
         }
         return res.status(200).send({ houseInfo})
     } catch (error) {
