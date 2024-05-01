@@ -32,6 +32,12 @@ const applicationValidator = (req, res, next) => {
   if (!picture || picture == "") {
     req.body.application.picture = "default placeholder image";
   }
+  // check address
+  if (!req.body.application.address.buildingAptNum) {
+    return res
+      .status(422)
+      .send({ message: "building/apt # can only be number" });
+  }
   // check phone valid
   if (!checkPhone(cellPhone)) {
     return res
@@ -122,7 +128,12 @@ const checkIfEmpty = (
 };
 
 const checkValidStatus = (status) => {
-  if (status === "approved" || status === "rejected" || status === "pending") {
+  if (
+    status === "not start" ||
+    status === "approved" ||
+    status === "rejected" ||
+    status === "pending"
+  ) {
     return true;
   }
   return false;

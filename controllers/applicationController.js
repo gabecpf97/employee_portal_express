@@ -77,7 +77,7 @@ const application_create = async (req, res, next) => {
       userId: req.body.application.userId,
     });
     if (theApplication) {
-      return next({ code: 200, message: "Already created application" });
+      return next({ code: 400, message: "Already created application" });
     }
     const newApplication = new Application(req.body.application);
     // create new opt request if select f1opt
@@ -102,14 +102,17 @@ const application_create = async (req, res, next) => {
       });
       await newOPt.save();
     }
+    newApplication.userId = req.body.userId;
+    newApplication.status = "pending";
     await newApplication.save();
     await User.findByIdAndUpdate(
-      newApplication.userId,
+      req.body.userId,
       { applicationId: newApplication._id, status: "pending" },
       {}
     );
-    return res.status(200).send({ id: newApplication._id });
+    return res.status(200).send({ application: newApplication });
   } catch (err) {
+    console.log(err);
     return next({ code: 500, message: err.message });
   }
 };
@@ -122,7 +125,8 @@ const application_update = async (req, res, next) => {
     } else {
       const updatedApplication = req.body.application;
       updatedApplication.userId = theApplication.userId;
-      updatedApplication.status = theApplication.status==="approved"?"approved":"pending";
+      updatedApplication.status =
+        theApplication.status === "approved" ? "approved" : "pending";
       updatedApplication.feedback = theApplication.feedback;
       await Application.findByIdAndUpdate(
         req.params.id,
@@ -130,7 +134,12 @@ const application_update = async (req, res, next) => {
         {}
       );
 
-      await User.findOneAndUpdate({_id:updatedApplication.userId},{status:theApplication.status==="approved"?"approved":"pending"})
+      await User.findOneAndUpdate(
+        { _id: updatedApplication.userId },
+        {
+          status: theApplication.status === "approved" ? "approved" : "pending",
+        }
+      );
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {
