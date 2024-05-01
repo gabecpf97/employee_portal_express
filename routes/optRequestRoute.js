@@ -5,6 +5,7 @@ import inputValidaton from "../middlewares/inputMiddleware.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
   convertFormDataToJson,
+  retrieveImageUrl,
   saveToAWS,
   uploadImageToMulterSafe,
 } from "../middlewares/AWSOPTMiddleware.js";
@@ -16,7 +17,6 @@ optRequestRouter.get(
   jwtValidation,
   optController.get_optId_by_applicationId
 );
-
 
 optRequestRouter.get(
   "/in-process",
@@ -46,6 +46,7 @@ optRequestRouter.put(
   jwtValidation,
   uploadImageToMulterSafe,
   saveToAWS,
+  retrieveImageUrl,
   convertFormDataToJson,
   inputValidaton.bodyInputValid,
   optController.optrequest_update_doc
