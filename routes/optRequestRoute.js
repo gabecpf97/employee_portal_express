@@ -8,6 +8,7 @@ import {
   saveToAWS,
   uploadImageToMulterSafe,
 } from "../middlewares/AWSOPTMiddleware.js";
+
 const optRequestRouter = express.Router();
 
 optRequestRouter.get(
@@ -16,12 +17,7 @@ optRequestRouter.get(
   optController.get_optId_by_applicationId
 );
 
-optRequestRouter.get(
-  "/",
-  jwtValidation,
-  restrictToHR,
-  optController.optrequest_get_all
-);
+
 optRequestRouter.get(
   "/in-process",
   jwtValidation,
@@ -29,6 +25,13 @@ optRequestRouter.get(
   optController.optrequest_get_inProgress
 );
 optRequestRouter.get("/:id", jwtValidation, optController.optrequest_get_id);
+
+optRequestRouter.get(
+  "/",
+  jwtValidation,
+  restrictToHR,
+  optController.optrequest_get_all
+);
 
 // optRequestRouter.put(
 //   "/:id",
