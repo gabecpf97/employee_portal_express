@@ -146,9 +146,11 @@ const application_hr_update = async (req, res, next) => {
     } else {
       await Application.findByIdAndUpdate(
         req.params.id,
-        { feedback: req.body.feedback, status: req.body.status },
+        { feedback: req.body.feedback?req.body.feedback:"", 
+          status: req.body.status },
         {}
       );
+      await User.findOneAndUpdate({applicationId:req.params.id},{status:req.body.status})
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {

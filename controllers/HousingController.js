@@ -1,14 +1,20 @@
 import Housing from '../models/Housing.js';
 import User from '../models/User.js';
+import Application from '../models/Application.js';
 
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
     try {
-        const houseInfo = await Housing.findById(housingId).populate('residentIds');
+        const houseInfo = await Housing.findById(housingId).populate('facilityReportsIds');
         if(!houseInfo){
             return res.status(404).send({ message: "housing does noe exist"})
         }
-        return res.status(200).send({ houseInfo})
+        const residents = []
+        for(const residentId of houseInfo.residentIds){
+            const profile = await Application.findOne({userId:residentId}).select("userId firstName middleName lastName prefferedName cellPhone email car")
+            residents.push(profile)
+        }
+        return res.status(200).send({ houseInfo, residents})
     } catch (error) {
         return res.status(401).send({
             message: error.message

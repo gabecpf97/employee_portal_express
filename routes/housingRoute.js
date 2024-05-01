@@ -6,7 +6,7 @@ import {
   DeleteHousing,
   ShowAllHousing,
 } from "../controllers/HousingController.js";
-import { jwtValidation } from "../middlewares/AuthMiddleware.js";
+import { jwtValidation , restrictToHR} from "../middlewares/AuthMiddleware.js";
 import {
     CreateFacilityReport,
     ShowUserFacilityReports,
@@ -17,17 +17,17 @@ import {
 
 
 //HousingController
-router.post("/", jwtValidation, CreateHousing);
-router.get("/", jwtValidation, ShowAllHousing);
+router.post("/", jwtValidation, restrictToHR, CreateHousing);
 router.get("/:housingId", jwtValidation, ShowUserHousing);
-router.delete("/:housingId", jwtValidation, DeleteHousing);
+router.get("/", jwtValidation, restrictToHR, ShowAllHousing);
+router.delete("/:housingId", jwtValidation, restrictToHR, DeleteHousing);
 
 //FacilitiesController
 router.post("/reports", jwtValidation, CreateFacilityReport);
-router.get("/reports/all", jwtValidation, ShowUserFacilityReports);
+router.get("/reports/all", jwtValidation, ShowUserFacilityReports); //not in use
 router.get("/reports/:reportId", jwtValidation, GetSingleFacilityReport);
 router.post("/reports/:reportId/comments", jwtValidation, PostCommentToReport )
-router.get("/reports/:reportId/comments", jwtValidation, GetSingleFacilityComments )
+router.get("/reports/:reportId/comments", jwtValidation, GetSingleFacilityComments ) //not in use
 
 
 export default router;
