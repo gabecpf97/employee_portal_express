@@ -39,9 +39,9 @@ app.use(
   })
 );
 
-// // for testing retrieveImageUrl
-// import { retrieveImageUrl } from "./middlewares/AWSMiddleware.js";
-// app.get("/api/posts", retrieveImageUrl);
+// for testing retrieveImageUrl
+import { retrieveImageUrl } from "./middlewares/AWSMiddleware.js";
+app.get("/api/posts", retrieveImageUrl);
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
