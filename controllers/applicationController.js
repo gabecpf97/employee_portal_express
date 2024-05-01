@@ -5,7 +5,7 @@ import User from "../models/User.js";
 // Allows HR to see a summary of each employee’s profile
 const application_getAll = async (req, res) => {
   try {
-    const applications = await Application.find({status:"approved"});
+    const applications = await Application.find({ status: "approved" });
 
     return res.status(200).json({
       length: applications.length,
@@ -60,7 +60,9 @@ const application_status = async (req, res) => {
 
 const application_get = async (req, res, next) => {
   try {
-    const theApplication = await Application.findById(req.params.id);
+    const theApplication = await Application.findOne({
+      userId: req.body.userId,
+    });
     if (!theApplication) {
       return next({ code: 422, message: "No such application" });
     } else {
@@ -155,11 +157,16 @@ const application_hr_update = async (req, res, next) => {
     } else {
       await Application.findByIdAndUpdate(
         req.params.id,
-        { feedback: req.body.feedback?req.body.feedback:"", 
-          status: req.body.status },
+        {
+          feedback: req.body.feedback ? req.body.feedback : "",
+          status: req.body.status,
+        },
         {}
       );
-      await User.findOneAndUpdate({applicationId:req.params.id},{status:req.body.status})
+      await User.findOneAndUpdate(
+        { applicationId: req.params.id },
+        { status: req.body.status }
+      );
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {

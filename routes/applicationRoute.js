@@ -18,7 +18,11 @@ applicationRouter.get(
   applicationController.application_status
 );
 
-applicationRouter.get("/:id", applicationController.application_get);
+applicationRouter.get(
+  "/getMy",
+  jwtValidation,
+  applicationController.application_get
+);
 
 // need token auth
 applicationRouter.post(
