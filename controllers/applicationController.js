@@ -5,7 +5,7 @@ import User from "../models/User.js";
 // Allows HR to see a summary of each employee’s profile
 const application_getAll = async (req, res) => {
   try {
-    const applications = await Application.find({status:"approved"});
+    const applications = await Application.find({ status: "approved" });
 
     return res.status(200).json({
       length: applications.length,
@@ -60,7 +60,9 @@ const application_status = async (req, res) => {
 
 const application_get = async (req, res, next) => {
   try {
-    const theApplication = await Application.findById(req.params.id);
+    const theApplication = await Application.findOne({
+      userId: req.body.userId,
+    });
     if (!theApplication) {
       return next({ code: 422, message: "No such application" });
     } else {
@@ -77,7 +79,7 @@ const application_create = async (req, res, next) => {
       userId: req.body.application.userId,
     });
     if (theApplication) {
-      return next({ code: 200, message: "Already created application" });
+      return next({ code: 400, message: "Already created application" });
     }
     const newApplication = new Application(req.body.application);
     // create new opt request if select f1opt
@@ -102,14 +104,17 @@ const application_create = async (req, res, next) => {
       });
       await newOPt.save();
     }
+    newApplication.userId = req.body.userId;
+    newApplication.status = "pending";
     await newApplication.save();
     await User.findByIdAndUpdate(
-      newApplication.userId,
+      req.body.userId,
       { applicationId: newApplication._id, status: "pending" },
       {}
     );
-    return res.status(200).send({ id: newApplication._id });
+    return res.status(200).send({ application: newApplication });
   } catch (err) {
+    console.log(err);
     return next({ code: 500, message: err.message });
   }
 };
@@ -122,7 +127,8 @@ const application_update = async (req, res, next) => {
     } else {
       const updatedApplication = req.body.application;
       updatedApplication.userId = theApplication.userId;
-      updatedApplication.status = theApplication.status==="approved"?"approved":"pending";
+      updatedApplication.status =
+        theApplication.status === "approved" ? "approved" : "pending";
       updatedApplication.feedback = theApplication.feedback;
       await Application.findByIdAndUpdate(
         req.params.id,
@@ -130,7 +136,12 @@ const application_update = async (req, res, next) => {
         {}
       );
 
-      await User.findOneAndUpdate({_id:updatedApplication.userId},{status:theApplication.status==="approved"?"approved":"pending"})
+      await User.findOneAndUpdate(
+        { _id: updatedApplication.userId },
+        {
+          status: theApplication.status === "approved" ? "approved" : "pending",
+        }
+      );
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {
@@ -146,11 +157,16 @@ const application_hr_update = async (req, res, next) => {
     } else {
       await Application.findByIdAndUpdate(
         req.params.id,
-        { feedback: req.body.feedback?req.body.feedback:"", 
-          status: req.body.status },
+        {
+          feedback: req.body.feedback ? req.body.feedback : "",
+          status: req.body.status,
+        },
         {}
       );
-      await User.findOneAndUpdate({applicationId:req.params.id},{status:req.body.status})
+      await User.findOneAndUpdate(
+        { applicationId: req.params.id },
+        { status: req.body.status }
+      );
       return res.status(200).send({ id: theApplication._id });
     }
   } catch (err) {
