@@ -6,15 +6,17 @@ import containsIgnoreCase from "../utils/regularExpression.js";
 const get_optId_by_applicationId = async (req, res) => {
   try {
     const { userId } = req.body;
-    const application = await Application.findOne({userId:userId})
-    const opt_request = await OPTRequest.findOne({appId:application._id})
+    const application = await Application.findOne({ userId: userId });
+    const opt_request = await OPTRequest.findOne({ appId: application._id });
 
-    if(!opt_request){
-      return res.status(400).send({ message:"User does not have OPT request submitted" });
+    if (!opt_request) {
+      return res
+        .status(400)
+        .send({ message: "User does not have OPT request submitted" });
     }
 
     return res.status(200).json({
-      requestId : opt_request._id
+      requestId: opt_request._id,
     });
   } catch (error) {
     return next({ code: 500, message: error.message });
@@ -41,7 +43,7 @@ const optrequest_update_doc = async (req, res, next) => {
           feedback: "",
         };
         await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
-        return res.status(200).send({ id: theOptRequest._id });
+        return res.status(200).send({ visa: updateRequest });
       }
     }
   } catch (err) {
@@ -82,42 +84,49 @@ const optrequest_get_inProgress = async (req, res, next) => {
 // get all visa request
 const optrequest_get_all = async (req, res, next) => {
   try {
-
     const theRequests = await OPTRequest.find({}).populate({
       path: "appId",
       select: "firstName lastName prefferedName workAuthorization",
     });
-    console.log(theRequests)
     if (theRequests.length < 1) {
       return res.status(200).send({ requests: [] });
     } else {
-      // const result = theRequests.filter(
-      //   (request) =>
-      //     request.appId.firstName === req.query.name ||
-      //     request.appId.lastName === req.query.name ||
-      //     request.appId.preferredName === req.query.name
-      // );
-       const result = theRequests.filter(
-        (request) => {
-          if(!request.appId){
-            return false
+      if (!req.query.all) {
+        const result = theRequests.filter((request) => {
+          if (!request.appId) {
+            return false;
           }
-          if(req.query.firstName && !containsIgnoreCase(request.appId.firstName, req.query.firstName)){
-            return false
+          if (
+            req.query.firstName &&
+            containsIgnoreCase(request.appId.firstName, req.query.firstName)
+          ) {
+            return true;
           }
-          if(req.query.lastName && !containsIgnoreCase(request.appId.lastName, req.query.lastName)){
-            return false
+          if (
+            req.query.lastName &&
+            containsIgnoreCase(request.appId.lastName, req.query.lastName)
+          ) {
+            return true;
           }
-          if(request.appId.preferredName && req.query.preferredName && !containsIgnoreCase(request.appId.preferredName, req.query.preferredName)){
-            return false
+          if (
+            request.appId.preferredName &&
+            req.query.preferredName &&
+            containsIgnoreCase(
+              request.appId.preferredName,
+              req.query.preferredName
+            )
+          ) {
+            return true;
           }
-          return true
-        }
-      );
-      return res.status(200).send({ requests: result });
+          return false;
+        });
+        return res.status(200).send({ requests: result });
+      } else {
+        return res.status(200).send({ requests: theRequests });
+      }
     }
   } catch (err) {
-    return res.status(500).send({ message:err.message });
+    return res.status(500).send({ message: err.message });
   }
 };
 
@@ -131,7 +140,7 @@ const optrequest_hr_action = async (req, res, next) => {
       updateRequest[theRequest.step] = {
         status: req.body.status,
         document: theRequest[theRequest.step].document,
-        feedback: req.body.feedback?req.body.feedback:"",
+        feedback: req.body.feedback ? req.body.feedback : "",
       };
       if (req.body.status === "approved") {
         updateRequest.step = nextStep(theRequest.step);
@@ -171,7 +180,8 @@ const optrequest_hr_send_noti = async (req, res, next) => {
       } else {
         return next({
           code: 400,
-          message: "File already exists for current step",
+          message:
+            "File already exists for current step / previous step not approved",
         });
       }
     }
@@ -204,7 +214,7 @@ const optController = {
   optrequest_get_all,
   optrequest_hr_action,
   optrequest_hr_send_noti,
-  get_optId_by_applicationId
+  get_optId_by_applicationId,
 };
 
 export default optController;

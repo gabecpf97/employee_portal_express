@@ -24,17 +24,15 @@ const multerFilter = (req, file, cb) => {
   }
 };
 const upload = multer({ storage: storage, fileFilter: multerFilter });
-const uploadImageToMulter = upload.fields([
-  { name: "document", maxCount: 1 },
-]);
+const uploadImageToMulter = upload.fields([{ name: "document", maxCount: 1 }]);
 
 const uploadImageToMulterSafe = (req, res, next) => {
-  console.log("in safe")
+  console.log("in safe");
   uploadImageToMulter(req, res, (err) => {
-      if (err) {
-          return res.status(400).json({ message: err.message });
-      }
-      next();
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
   });
 };
 
@@ -43,12 +41,12 @@ const generateFileName = (bytes = 16) =>
 
 const saveToAWS = async (req, res, next) => {
   try {
-    console.log("in save to aws")
+    console.log("in save to aws");
     const paramss = [];
     const keys = {
       document: "OPT_document_" + generateFileName(),
     };
-    
+
     const file1 = {
       Bucket: process.env.BUCKET_NAME,
       Key: "OPT_document_" + generateFileName(),
@@ -65,7 +63,21 @@ const saveToAWS = async (req, res, next) => {
       })
     );
 
-    req.body.s3Keys = keys;
+    const retrieveParams = [];
+    for (let i = 0; i < keys.length; i++) {
+      retrieveParams.push({
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys[i],
+      });
+    }
+
+    for (let i = 0; i < keys.length; i++) {
+      const command = new GetObjectCommand(retrieveParams[i]);
+      const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
+      keys[i] = url;
+    }
+
+    req.body.keys = keys;
     next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -73,39 +85,41 @@ const saveToAWS = async (req, res, next) => {
 };
 
 const convertFormDataToJson = (req, res, next) => {
-  try{
+  try {
     const { s3Keys } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     const applicationData = {
       ...req.body,
       document: s3Keys.document,
     };
 
-    console.log(applicationData)
+    console.log(applicationData);
 
     req.body = applicationData;
-    console.log(req.body)
+    console.log(req.body);
     next();
-  } catch(err){
+  } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
 const retrieveImageUrl = async (req, res, next) => {
   try {
+    const key = req.body.keys;
     const params = {
       Bucket: process.env.BUCKET_NAME,
-      Key: req.body.imageName,
+      Key: key.document,
     };
 
     const command = new GetObjectCommand(params);
     const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
+    const document = url.split("?")[0];
     // res.status(200).json({
     //   status: "success",
     //   url,
     // });
 
-    req.body.url = url;
+    req.body.s3Keys = { document };
     next();
   } catch (error) {
     return res.status(500).json({ message: error.message });

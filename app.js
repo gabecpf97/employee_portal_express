@@ -34,18 +34,13 @@ app.use(express.static(path.join(__dirname, "public")));
 //added cors to allow cross origin requests
 app.use(
   cors({
-    origin: ["http://localhost:5173","http://localhost:4200"]
-    // origin: "http://localhost:4200",
+    origin: ["http://localhost:5173", "http://localhost:4200"],
   })
 );
 
 // for testing retrieveImageUrl
-// import {
-//   uploadImageToMulter,
-//   saveToAWS,
-//   retrieveImageUrl,
-// } from "./middlewares/AWSMiddleware.js";
-// app.get("/api/posts", retrieveImageUrl);
+import { retrieveImageUrl } from "./middlewares/AWSMiddleware.js";
+app.get("/api/posts", retrieveImageUrl);
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);

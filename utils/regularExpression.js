@@ -1,5 +1,6 @@
 function containsIgnoreCase(str, searchStr) {
-    return new RegExp(searchStr, "i").test(str);
-  }
+  const regex = new RegExp(`^${searchStr}$`, "i");
+  return regex.test(str);
+}
 
-export default containsIgnoreCase
+export default containsIgnoreCase;

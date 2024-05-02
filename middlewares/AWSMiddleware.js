@@ -17,6 +17,7 @@ const S3 = new S3Client({
 const storage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
+  console.log("in multerFilter")
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
@@ -31,12 +32,13 @@ const uploadImageToMulter = upload.fields([
 ]);
 
 const uploadImageToMulterSafe = (req, res, next) => {
-  console.log("in safe")
+  console.log("in safe");
   uploadImageToMulter(req, res, (err) => {
-      if (err) {
-          return res.status(400).json({ message: err.message });
-      }
-      next();
+
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
   });
 };
 
@@ -45,14 +47,14 @@ const generateFileName = (bytes = 16) =>
 
 const saveToAWS = async (req, res, next) => {
   try {
-    console.log("in save to aws")
+    console.log("in save to aws");
     const paramss = [];
     const keys = {
       picture: "picture_" + generateFileName(),
       DriverLicense: "driverLicense_" + generateFileName(),
       WorkAuthorization: "workAuthorization_" + generateFileName(),
     };
-    
+
     const file1 = {
       Bucket: process.env.BUCKET_NAME,
       Key: "picture_" + generateFileName(),
@@ -83,7 +85,22 @@ const saveToAWS = async (req, res, next) => {
       })
     );
 
-    req.body.s3Keys = keys;
+    const retrieveParams = [];
+    for (let i = 0; i < keys.length; i++) {
+      retrieveParams.push({
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys[i],
+      });
+    }
+
+    for (let i = 0; i < keys.length; i++) {
+      const command = new GetObjectCommand(retrieveParams[i]);
+      const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
+      keys[i] = url;
+    }
+
+    req.body.keys = keys;
+
     next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -91,15 +108,15 @@ const saveToAWS = async (req, res, next) => {
 };
 
 const convertFormDataToJson = (req, res, next) => {
-  try{
+  try {
     const { s3Keys } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     const applicationData = {
       ...req.body,
       address: JSON.parse(req.body.address),
       car: JSON.parse(req.body.car),
       reference: JSON.parse(req.body.reference),
-      emergency: JSON.parse(req.body.emergency),
+      emergency: req.body.emergency.map((contact) => JSON.parse(contact)),
       picture: s3Keys.picture,
       driverLicense: {
         number: req.body.driverLicense_number,
@@ -116,26 +133,40 @@ const convertFormDataToJson = (req, res, next) => {
 
     req.body.application = applicationData;
     next();
-  } catch(err){
+  } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
 const retrieveImageUrl = async (req, res, next) => {
   try {
-    const params = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: req.body.imageName,
-    };
+    const keys = req.body.keys;
+    console.log(keys);
+    const paramss = [
+      {
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys.picture,
+      },
+      {
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys.DriverLicense,
+      },
+      {
+        Bucket: process.env.BUCKET_NAME,
+        Key: keys.WorkAuthorization,
+      },
+    ];
 
-    const command = new GetObjectCommand(params);
-    const url = await getSignedUrl(S3, command, { expiresIn: 3600 });
-    // res.status(200).json({
-    //   status: "success",
-    //   url,
-    // });
+    const command = new GetObjectCommand(paramss[0]);
+    const picture = await getSignedUrl(S3, command, { expiresIn: 3600 });
+    const command2 = new GetObjectCommand(paramss[1]);
+    const DriverLicense = await getSignedUrl(S3, command2, { expiresIn: 3600 });
+    const command3 = new GetObjectCommand(paramss[2]);
+    const WorkAuthorization = await getSignedUrl(S3, command3, {
+      expiresIn: 3600,
+    });
 
-    req.body.url = url;
+    req.body.s3Keys = { picture, DriverLicense, WorkAuthorization };
     next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
