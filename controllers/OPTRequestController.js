@@ -88,45 +88,42 @@ const optrequest_get_all = async (req, res, next) => {
       path: "appId",
       select: "firstName lastName prefferedName workAuthorization",
     });
-    console.log(theRequests);
     if (theRequests.length < 1) {
       return res.status(200).send({ requests: [] });
     } else {
-      // const result = theRequests.filter(
-      //   (request) =>
-      //     request.appId.firstName === req.query.name ||
-      //     request.appId.lastName === req.query.name ||
-      //     request.appId.preferredName === req.query.name
-      // );
-      const result = theRequests.filter((request) => {
-        if (!request.appId) {
+      if (!req.query.all) {
+        const result = theRequests.filter((request) => {
+          if (!request.appId) {
+            return false;
+          }
+          if (
+            req.query.firstName &&
+            containsIgnoreCase(request.appId.firstName, req.query.firstName)
+          ) {
+            return true;
+          }
+          if (
+            req.query.lastName &&
+            containsIgnoreCase(request.appId.lastName, req.query.lastName)
+          ) {
+            return true;
+          }
+          if (
+            request.appId.preferredName &&
+            req.query.preferredName &&
+            containsIgnoreCase(
+              request.appId.preferredName,
+              req.query.preferredName
+            )
+          ) {
+            return true;
+          }
           return false;
-        }
-        if (
-          req.query.firstName &&
-          !containsIgnoreCase(request.appId.firstName, req.query.firstName)
-        ) {
-          return false;
-        }
-        if (
-          req.query.lastName &&
-          !containsIgnoreCase(request.appId.lastName, req.query.lastName)
-        ) {
-          return false;
-        }
-        if (
-          request.appId.preferredName &&
-          req.query.preferredName &&
-          !containsIgnoreCase(
-            request.appId.preferredName,
-            req.query.preferredName
-          )
-        ) {
-          return false;
-        }
-        return true;
-      });
-      return res.status(200).send({ requests: result });
+        });
+        return res.status(200).send({ requests: result });
+      } else {
+        return res.status(200).send({ requests: theRequests });
+      }
     }
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -183,7 +180,8 @@ const optrequest_hr_send_noti = async (req, res, next) => {
       } else {
         return next({
           code: 400,
-          message: "File already exists for current step",
+          message:
+            "File already exists for current step / previous step not approved",
         });
       }
     }
