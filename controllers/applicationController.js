@@ -83,7 +83,7 @@ const application_create = async (req, res, next) => {
     }
     const newApplication = new Application(req.body.application);
     // create new opt request if select f1opt
-    if (newApplication.workAuthorization.type === "f1opt") {
+    if (newApplication.workAuthorization.type === "F1(CPT/OPT)") {
       const newOPt = new OPTRequest({
         appId: newApplication._id,
         step: "OPTReceipt",
