@@ -58,11 +58,24 @@ const application_status = async (req, res) => {
   }
 };
 
-const application_get = async (req, res, next) => {
+const application_getMy = async (req, res, next) => {
   try {
     const theApplication = await Application.findOne({
       userId: req.body.userId,
     });
+    if (!theApplication) {
+      return next({ code: 422, message: "No such application" });
+    } else {
+      return res.status(200).send({ application: theApplication });
+    }
+  } catch (err) {
+    return next({ code: 500, message: err.message });
+  }
+};
+
+const application_get = async (req, res, next) => {
+  try {
+    const theApplication = await Application.findById(req.params.id);
     if (!theApplication) {
       return next({ code: 422, message: "No such application" });
     } else {
@@ -178,6 +191,7 @@ const applicationController = {
   application_getAll,
   application_filter,
   application_get,
+  application_getMy,
   application_create,
   application_update,
   application_hr_update,

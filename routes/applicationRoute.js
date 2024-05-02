@@ -21,6 +21,12 @@ applicationRouter.get(
 applicationRouter.get(
   "/getMy",
   jwtValidation,
+  applicationController.application_getMy
+);
+
+applicationRouter.get(
+  "/:id",
+  jwtValidation,
   applicationController.application_get
 );
 
