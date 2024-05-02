@@ -1,8 +1,8 @@
 import validator from 'validator';
 
 const editUserValidation = (req, res, next) => {
-    const { new_username,  new_password, new_email } = req.body;
-    console.log(new_username,  new_password, new_email)
+    try{
+        const { new_username,  new_password, new_email } = req.body;
     // Check for missing fields
     if (validator.isEmpty(new_username) && validator.isEmpty(new_password) && validator.isEmpty(new_email)) {
         return res.status(400).json({ message: 'Please provide at least one field!' });
@@ -12,14 +12,14 @@ const editUserValidation = (req, res, next) => {
         // Username validation
         const usernameMinLength = 3;
         const usernameMaxLength = 20;
-        if (!validator.isLength(username, { min: usernameMinLength, max: usernameMaxLength }) || !validator.isAlphanumeric(username, 'en-US')) {
+        if (!validator.isLength(new_username, { min: usernameMinLength, max: usernameMaxLength }) || !validator.isAlphanumeric(new_username, 'en-US')) {
             return res.status(400).json({ message: 'Username must be 3-20 characters and alphanumeric!' });
         }
     }
 
     if(new_password){
         // Password validation
-        if (!validator.isStrongPassword(password, {
+        if (!validator.isStrongPassword(new_password, {
             minLength: 8,
             minLowercase: 1,
             minUppercase: 1,
@@ -36,12 +36,17 @@ const editUserValidation = (req, res, next) => {
         // Email validation
         const emailMinLength = 6;
         const emailMaxLength = 50; 
-        if (!validator.isLength(email, { min: emailMinLength, max: emailMaxLength }) || !validator.isEmail(email)) {
+        if (!validator.isLength(new_email, { min: emailMinLength, max: emailMaxLength }) || !validator.isEmail(new_email)) {
             return res.status(400).json({ message: 'Email is not valid or length is incorrect!' });
         }
     }
-
+    console.log(new_username,  new_password, new_email)
     next();
+    }catch(err){
+        console.log(err.message)
+        res.status(500).json({ message: err.message });
+    }
+    
 };
 
 export { editUserValidation };
