@@ -17,6 +17,7 @@ const S3 = new S3Client({
 const storage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
+  console.log("in multerFilter")
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
@@ -33,6 +34,7 @@ const uploadImageToMulter = upload.fields([
 const uploadImageToMulterSafe = (req, res, next) => {
   console.log("in safe");
   uploadImageToMulter(req, res, (err) => {
+
     if (err) {
       return res.status(400).json({ message: err.message });
     }
