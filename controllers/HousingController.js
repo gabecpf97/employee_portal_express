@@ -11,7 +11,7 @@ const ShowUserHousing = async (req, res) => {
         }
         const residents = []
         for(const residentId of houseInfo.residentIds){
-            const profile = await Application.findOne({userId:residentId}).select("userId firstName middleName lastName prefferedName cellPhone email car")
+            const profile = await Application.findOne({userId:residentId}).select("userId firstName middleName lastName preffered Name cellPhone email car")
             residents.push(profile)
         }
         return res.status(200).send({ houseInfo, residents})
@@ -24,6 +24,7 @@ const ShowUserHousing = async (req, res) => {
 
 const CreateHousing = async (req, res) => {
     const userId = req.body.userId;
+    console.log(req.body)
 
     try {
         const userInfo = await User.findById(userId);
