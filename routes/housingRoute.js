@@ -15,7 +15,8 @@ import {
     GetSingleFacilityReport,
     PostCommentToReport,
     GetSingleFacilityComments,
-    UpdateReportStatus
+    UpdateReportStatus,
+    UpdateComment
     
 } from "../controllers/FacilityReportController.js";
 
@@ -35,6 +36,7 @@ router.get("/reports/:reportId/comments", jwtValidation, GetSingleFacilityCommen
 router.post("/reports/getUserInfo", jwtValidation, GetUserName)
 router.post("/reports/updateStatus", jwtValidation, UpdateReportStatus)
 router.get("/getApplicationInfo/:userIdFront", jwtValidation, GetApplicationInfo)
+router.post("/comments/updateComment", jwtValidation, UpdateComment)
 
 
 export default router;
