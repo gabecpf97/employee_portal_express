@@ -171,6 +171,27 @@ const UpdateReportStatus = async (req, res) => {
     }
 }
 
+const UpdateComment = async (req, res) => {
+    const newComment = req.body.newComment;
+    const commentId = req.body.commentId;
+    const reportId = req.body.reportId;
+
+    try {
+        const result = await FacilityReport.updateOne(
+            { "_id" : reportId, "comments._id": commentId },
+            { $set: { "comments.$.description": newComment } }
+        );
+
+        if(result.nModified === 0) {
+            return res.status(404).send({ message: "No comment found or no change made." });
+        }
+
+        res.send({ message: "Comment updated successfully" });
+    } catch (error) {
+        res.status(500).send({ message: "Error updating comment: " + error.message });
+    }
+};
+
 
 export {
     CreateFacilityReport,
@@ -178,5 +199,6 @@ export {
     GetSingleFacilityReport,
     PostCommentToReport,
     GetSingleFacilityComments,
-    UpdateReportStatus
+    UpdateReportStatus,
+    UpdateComment
 };
