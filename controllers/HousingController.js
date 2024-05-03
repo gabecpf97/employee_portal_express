@@ -107,10 +107,30 @@ const GetUserName = async (req, res) => {
     }
 }
 
+const GetApplicationInfo = async (req, res) => {
+    const userIdFront = req.params.userIdFront;
+    try {
+        const applicationInfo = await Application.findOne({userId: userIdFront});
+        if (!applicationInfo){
+            return res.status(404).send({
+                message: "Application not found."
+            });
+        }
+        const applicationId = applicationInfo['_id'];
+        return res.status(200).send({applicationId});
+    } catch (error){
+        return res.status(500).send({
+            message: error.message
+        });
+    }
+        
+    }
+
 export { 
     ShowUserHousing, 
     CreateHousing,
     DeleteHousing,
     ShowAllHousing,
     GetUserName,
+    GetApplicationInfo
 };
