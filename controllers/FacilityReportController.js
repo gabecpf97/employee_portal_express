@@ -52,6 +52,7 @@ const CreateFacilityReport = async (req, res) => {
     }
 };
 
+
 const ShowUserFacilityReports = async (req, res) => {
     const userId = req.body.userId;
     console.log(userId);
@@ -144,10 +145,38 @@ const GetSingleFacilityComments = async (req, res) => {
     }
 }
 
+const UpdateReportStatus = async (req, res) => {
+    const reportId = req.body.reportId;
+    const newStatus = req.body.newStatus;
+    try {
+        const updatedReport =  await FacilityReport.findByIdAndUpdate(
+            reportId,
+        { status: newStatus},
+        {new: true}
+    );
+    if (!updatedReport) {
+        return res.status(404).send({
+            message: "Report not found or no updates made."
+        });
+    }
+    res.send({
+        message: "Report updated successfully.",
+        data: updatedReport
+    });
+
+    } catch (error) {
+        return res.status(500).send({
+            message: error.message
+        });
+    }
+}
+
+
 export {
     CreateFacilityReport,
     ShowUserFacilityReports,
     GetSingleFacilityReport,
     PostCommentToReport,
     GetSingleFacilityComments,
+    UpdateReportStatus
 };
