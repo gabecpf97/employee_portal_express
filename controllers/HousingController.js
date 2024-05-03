@@ -95,11 +95,22 @@ const ShowAllHousing = async (req, res) => {
     }
 }
 
-
+const GetUserName = async (req, res) => {
+    const userIdfront = req.body.userIdfront;
+    try {
+        const userInfo = await User.findById(userIdfront);
+        return res.status(200).send({userInfo});
+    } catch (error) {
+        return res.status(500).send({
+            message: error.message
+        });
+    }
+}
 
 export { 
     ShowUserHousing, 
     CreateHousing,
     DeleteHousing,
     ShowAllHousing,
+    GetUserName,
 };
