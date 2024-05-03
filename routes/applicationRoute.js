@@ -19,6 +19,13 @@ applicationRouter.get(
 );
 
 applicationRouter.get(
+  "/search",
+  jwtValidation,
+  restrictToHR,
+  applicationController.application_filter
+);
+
+applicationRouter.get(
   "/getMy",
   jwtValidation,
   applicationController.application_getMy
@@ -60,6 +67,13 @@ applicationRouter.put(
   jwtValidation,
   restrictToHR,
   applicationController.application_hr_update
+);
+
+applicationRouter.get(
+  "/hr/all",
+  jwtValidation,
+  restrictToHR,
+  applicationController.application_get_all
 );
 
 export default applicationRouter;
