@@ -187,6 +187,19 @@ const application_hr_update = async (req, res, next) => {
   }
 };
 
+const application_get_all = async (req, res, next) => {
+  try {
+    const theApplications = await Application.find({});
+    if (theApplications.length < 1) {
+      return next({ code: 422, message: "No application" });
+    } else {
+      return res.status(200).send({ applications: theApplications });
+    }
+  } catch (err) {
+    return next({ code: 500, message: err.message });
+  }
+};
+
 const applicationController = {
   application_getAll,
   application_filter,
@@ -196,6 +209,7 @@ const applicationController = {
   application_update,
   application_hr_update,
   application_status,
+  application_get_all,
 };
 
 export default applicationController;
