@@ -1,6 +1,8 @@
-import { uploadImageToAWS, uploadImageToMulter } from "../config/AWS.js";
+import { S3, uploadImageToAWS, uploadImageToMulter } from "../config/AWS.js";
 import generateFileName from "../utils/generateFileName.js";
 import convertFormDataToJson from "../utils/convertFormDataToJson.js";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const uploadImageToMulterSafe = (req, res, next) => {
   console.log("in safe");
@@ -22,12 +24,17 @@ const saveToAWS = async (req, res, next) => {
     };
 
     const files = req.files;
-
     let picture = "";
     if (files.picture) {
       picture = await uploadImageToAWS(keys.picture, req.files.picture[0]);
     } else {
-      throw new Error("Please upload a picture of yourself!");
+      const paramsForRetrieve = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: "profile.png",
+      };
+
+      const command = new GetObjectCommand(paramsForRetrieve);
+      picture = await getSignedUrl(S3, command, { expiresIn: 3600 });
     }
 
     let DriverLicense = "";
