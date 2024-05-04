@@ -4,8 +4,6 @@ import applicationValidator from "../middlewares/ApplicationMiddleWare.js";
 import inputValidaton from "../middlewares/inputMiddleware.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
-  convertFormDataToJson,
-  retrieveImageUrl,
   saveToAWS,
   uploadImageToMulterSafe,
 } from "../middlewares/AWSMiddleware.js";
@@ -40,11 +38,9 @@ applicationRouter.get(
 // need token auth
 applicationRouter.post(
   "/create",
-  jwtValidation, //id and username will be added
+  jwtValidation,
   uploadImageToMulterSafe,
   saveToAWS,
-  retrieveImageUrl,
-  convertFormDataToJson,
   inputValidaton.applicationFieldValidation,
   applicationValidator,
   applicationController.application_create
@@ -55,8 +51,6 @@ applicationRouter.put(
   jwtValidation,
   uploadImageToMulterSafe,
   saveToAWS,
-  retrieveImageUrl,
-  convertFormDataToJson,
   inputValidaton.applicationFieldValidation,
   applicationValidator,
   applicationController.application_update

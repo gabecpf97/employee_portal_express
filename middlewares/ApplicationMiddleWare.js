@@ -10,7 +10,6 @@ const applicationValidator = (req, res, next) => {
     req.body.application.lastName,
     req.body.application.address,
     req.body.application.cellPhone,
-    req.body.application.email,
     req.body.application.SSN,
     req.body.application.DOB,
     req.body.application.citizenship,
@@ -22,7 +21,7 @@ const applicationValidator = (req, res, next) => {
   if (emptyCheck.code) {
     return res.status(422).send({ message: emptyCheck.message });
   }
-  const { status, picture, cellPhone, workPhone, email, gender, citizenship } =
+  const { status, picture, cellPhone, workPhone, gender, citizenship } =
     req.body.application;
   // check status
   if (!checkValidStatus(status)) {
@@ -49,12 +48,6 @@ const applicationValidator = (req, res, next) => {
       .status(422)
       .send({ message: "Please enter a valid workphone number" });
   }
-  // check email address
-  if (!validator.isEmail(email)) {
-    return res
-      .status(422)
-      .send({ message: "Please enter a valid email address" });
-  }
   // check gender
   if (gender !== "male" && gender !== "female" && gender !== "") {
     return res
@@ -80,7 +73,6 @@ const checkIfEmpty = (
   lastName,
   address,
   cellPhone,
-  email,
   SSN,
   DOB,
   citizenship,
@@ -102,9 +94,6 @@ const checkIfEmpty = (
   }
   if (!cellPhone) {
     return { message: "Missing cellPhone fields" };
-  }
-  if (!email) {
-    return { message: "Missing email fields" };
   }
   if (!SSN) {
     return { message: "Missing SSN fields" };

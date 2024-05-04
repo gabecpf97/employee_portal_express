@@ -6,20 +6,18 @@ import {
   DeleteHousing,
   ShowAllHousing,
   GetUserName,
-  GetApplicationInfo
+  GetApplicationInfo,
 } from "../controllers/HousingController.js";
-import { jwtValidation , restrictToHR} from "../middlewares/AuthMiddleware.js";
+import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
-    CreateFacilityReport,
-    ShowUserFacilityReports,
-    GetSingleFacilityReport,
-    PostCommentToReport,
-    GetSingleFacilityComments,
-    UpdateReportStatus,
-    UpdateComment
-    
+  CreateFacilityReport,
+  ShowUserFacilityReports,
+  GetSingleFacilityReport,
+  PostCommentToReport,
+  GetSingleFacilityComments,
+  UpdateReportStatus,
+  UpdateComment,
 } from "../controllers/FacilityReportController.js";
-
 
 //HousingController
 router.post("/", jwtValidation, restrictToHR, CreateHousing);
@@ -31,12 +29,19 @@ router.delete("/:housingId", jwtValidation, restrictToHR, DeleteHousing);
 router.post("/reports", jwtValidation, CreateFacilityReport);
 router.get("/reports/all", jwtValidation, ShowUserFacilityReports); //not in use
 router.get("/reports/:reportId", jwtValidation, GetSingleFacilityReport);
-router.post("/reports/:reportId/comments", jwtValidation, PostCommentToReport )
-router.get("/reports/:reportId/comments", jwtValidation, GetSingleFacilityComments ) //not in use
-router.post("/reports/getUserInfo", jwtValidation, GetUserName)
-router.post("/reports/updateStatus", jwtValidation, UpdateReportStatus)
-router.get("/getApplicationInfo/:userIdFront", jwtValidation, GetApplicationInfo)
-router.post("/comments/updateComment", jwtValidation, UpdateComment)
-
+router.post("/reports/:reportId/comments", jwtValidation, PostCommentToReport);
+router.get(
+  "/reports/:reportId/comments",
+  jwtValidation,
+  GetSingleFacilityComments
+); //not in use
+router.post("/reports/getUserInfo", jwtValidation, GetUserName);
+router.post("/reports/updateStatus", jwtValidation, UpdateReportStatus);
+router.get(
+  "/getApplicationInfo/:userIdFront",
+  jwtValidation,
+  GetApplicationInfo
+);
+router.post("/comments/updateComment", jwtValidation, UpdateComment);
 
 export default router;
