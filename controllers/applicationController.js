@@ -64,6 +64,17 @@ const application_getMy = async (req, res, next) => {
       userId: req.body.userId,
     });
     if (!theApplication) {
+      const theUser = await User.findById(req.body.userId);
+      if (!theUser) {
+        return next({ code: 422, message: "No such user" });
+      }
+      if (theUser.status === "not start") {
+        return res
+          .status(200)
+          .send({
+            application: { userId: req.body.userId, status: "not start" },
+          });
+      }
       return next({ code: 422, message: "No such application" });
     } else {
       return res.status(200).send({ application: theApplication });
@@ -89,11 +100,18 @@ const application_get = async (req, res, next) => {
 const application_create = async (req, res, next) => {
   try {
     const theApplication = await Application.findOne({
-      userId: req.body.application.userId,
+      userId: req.body.userId,
     });
     if (theApplication) {
       return next({ code: 400, message: "Already created application" });
     }
+    const theUser = await User.findById(req.body.userId);
+    if (!theUser) {
+      return next({ code: 422, message: "No such user" });
+    }
+    req.body.application.userId = req.body.userId;
+    req.body.application.email = theUser.email;
+    req.body.application.status = "pending";
     const newApplication = new Application(req.body.application);
     // create new opt request if select f1opt
     if (newApplication.workAuthorization.type === "F1(CPT/OPT)") {
@@ -117,8 +135,6 @@ const application_create = async (req, res, next) => {
       });
       await newOPt.save();
     }
-    newApplication.userId = req.body.userId;
-    newApplication.status = "pending";
     await newApplication.save();
     await User.findByIdAndUpdate(
       req.body.userId,
@@ -155,7 +171,7 @@ const application_update = async (req, res, next) => {
           status: theApplication.status === "approved" ? "approved" : "pending",
         }
       );
-      return res.status(200).send({ id: theApplication._id });
+      return res.status(200).send({ application: updatedApplication });
     }
   } catch (err) {
     return next({ code: 500, message: err.message });

@@ -38,7 +38,7 @@ applicationRouter.get(
 // need token auth
 applicationRouter.post(
   "/create",
-  jwtValidation, //id and username will be added
+  jwtValidation,
   uploadImageToMulterSafe,
   saveToAWS,
   inputValidaton.applicationFieldValidation,
