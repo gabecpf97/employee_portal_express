@@ -159,6 +159,18 @@ const application_update = async (req, res, next) => {
       updatedApplication.status =
         theApplication.status === "approved" ? "approved" : "pending";
       updatedApplication.feedback = theApplication.feedback;
+
+      //Michael: if update request contains no document, use previous ones
+      if(!updatedApplication.picture || updatedApplication.picture === "https://employee-visa-documents.s3.us-east-2.amazonaws.com/profile.png"){
+        updatedApplication.picture = theApplication.picture
+      }
+      if(!updatedApplication.workAuthorization.document){
+        updatedApplication.workAuthorization.document = theApplication.workAuthorization.document
+      }
+      if(!updatedApplication.driverLicense.document){
+        updatedApplication.driverLicense.document = theApplication.driverLicense.document
+      }
+      //---------------------------------------
       await Application.findByIdAndUpdate(
         req.params.id,
         updatedApplication,
