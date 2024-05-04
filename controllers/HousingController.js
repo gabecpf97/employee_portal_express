@@ -97,8 +97,10 @@ const ShowAllHousing = async (req, res) => {
 
 const GetUserName = async (req, res) => {
     const userIdfront = req.body.userIdfront;
+    // console.log(req.body)
     try {
         const userInfo = await User.findById(userIdfront);
+        // console.log(userInfo);
         return res.status(200).send({userInfo});
     } catch (error) {
         return res.status(500).send({
