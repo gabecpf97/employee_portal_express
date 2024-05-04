@@ -3,7 +3,7 @@ import OPTRequest from "../models/OPTRequest.js";
 import Application from "../models/Application.js";
 import containsIgnoreCase from "../utils/regularExpression.js";
 
-const get_optId_by_applicationId = async (req, res) => {
+const get_optId_by_applicationId = async (req, res, next) => {
   try {
     const { userId } = req.body;
     const application = await Application.findOne({ userId: userId });
