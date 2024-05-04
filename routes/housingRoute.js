@@ -7,8 +7,6 @@ import {
   ShowAllHousing,
   GetUserName,
   GetApplicationInfo,
-  // GetUserName,
-  // GetApplicationInfo
 } from "../controllers/HousingController.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
