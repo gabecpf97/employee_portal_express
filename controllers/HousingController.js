@@ -2,7 +2,7 @@ import Housing from '../models/Housing.js';
 import User from '../models/User.js';
 import Application from '../models/Application.js';
 
-// const ShowUserHousing = async (req, res) => {
+// const ShowUserHousingHR = async (req, res) => {
 //     const housingId = req.params.housingId;
 //     try {
 //         const houseInfo = await Housing.findById(housingId).populate({
@@ -27,6 +27,50 @@ import Application from '../models/Application.js';
 //         });
 //     }
 // }
+
+const ShowUserHousingHR = async (req, res) => {
+    const housingId = req.params.housingId;
+
+    try {
+        const houseInfo = await Housing.findById(housingId)
+            .populate({
+                path: 'facilityReportsIds',
+                populate: [
+                    {
+                        path: 'comments.createdBy', // Populate the user who created the comment
+                        model: 'User'
+                    },
+                    {
+                        path: 'createdBy', // Populate the user who created the facility report
+                        model: 'User'
+                    }
+                ]
+            })
+            .populate('residentIds');
+
+        if (!houseInfo) {
+            return res.status(404).send({ message: "Housing does not exist" });
+        }
+
+        const residents = {};
+        for (const residentId of houseInfo.residentIds) {
+            const user = await User.findById(residentId).populate('applicationId');
+
+            if (user && user.status === 'approved') {
+                const profile = await Application.findOne({ userId: residentId })
+                    .select("userId firstName middleName lastName preferredName cellPhone email car _id");
+
+                if (profile) {
+                    residents[residentId._id] = profile;
+                }
+            }
+        }
+        return res.status(200).send({ houseInfo, residents });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: error.message });
+    }
+}
 
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
@@ -180,5 +224,6 @@ export {
     DeleteHousing,
     ShowAllHousing,
     GetUserName,
-    GetApplicationInfo
+    GetApplicationInfo,
+    ShowUserHousingHR
 };
