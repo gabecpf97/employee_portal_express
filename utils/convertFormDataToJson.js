@@ -6,7 +6,7 @@ const convertFormDataToJson = (requestBody) => {
     address: JSON.parse(requestBody.address),
     car: JSON.parse(requestBody.car),
     reference: JSON.parse(requestBody.reference),
-    emergency: JSON.parse(requestBody.emergency),
+    emergency: requestBody.emergency.map((contact) => JSON.parse(contact)),
     picture: s3Keys.picture,
     driverLicense: {
       number: requestBody.driverLicense_number,
