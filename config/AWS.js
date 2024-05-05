@@ -17,7 +17,10 @@ const storage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
   console.log("in multerFilter");
-  if (file.mimetype.startsWith("image")) {
+  if (
+    file.mimetype.startsWith("image") ||
+    file.mimetype.startsWith("application/pdf")
+  ) {
     cb(null, true);
   } else {
     cb(new Error("Not an image! Please upload only images!", 400), false);
