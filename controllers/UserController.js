@@ -89,6 +89,12 @@ const editUserInfo = async (req, res) => {
 
         //update user document
         if(new_username){
+            const otherUser = await User.findOne({username:new_username})
+            if(otherUser && (otherUser._id.toString() != user._id.toString())){
+              return res.status(400).json({
+                message: "Username alreay exists!",
+              });
+            }
             const updatedUsername = await User.findByIdAndUpdate(target_userId, {username:new_username},{ new: true })
         }
         if(new_email){
