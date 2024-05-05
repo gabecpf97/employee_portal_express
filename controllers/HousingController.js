@@ -75,11 +75,22 @@ const ShowUserHousingHR = async (req, res) => {
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
 
+
     try {
+        const houseInfo = await Housing.findById(housingId)
+            .populate({
         const houseInfo = await Housing.findById(housingId)
             .populate({
                 path: 'facilityReportsIds',
                 populate: {
+                    path: 'comments.createdBy',
+                    model: 'User',
+                },
+            })
+            .populate('residentIds');
+
+        if (!houseInfo) {
+            return res.status(404).send({ message: "Housing does not exist" });
                     path: 'comments.createdBy',
                     model: 'User',
                 },
@@ -102,12 +113,31 @@ const ShowUserHousing = async (req, res) => {
                     residents[residentId._id] = profile;
                 }
             }
+
+        const residents = {};
+        for (const residentId of houseInfo.residentIds) {
+            const user = await User.findById(residentId).populate('applicationId');
+
+            if (user && user.status === 'approved') {
+                const profile = await Application.findOne({ userId: residentId })
+                    .select("userId firstName middleName lastName preferredName cellPhone email car");
+
+                if (profile) {
+                    residents[residentId._id] = profile;
+                }
+            }
         }
+        return res.status(200).send({ houseInfo, residents });
         return res.status(200).send({ houseInfo, residents });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: error.message });
+        console.error(error);
+        return res.status(500).send({ message: error.message });
     }
+};
+
+
 };
 
 

@@ -6,6 +6,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const uploadImageToMulterSafe = (req, res, next) => {
   console.log("in safe");
+  console.log(req.body);
   uploadImageToMulter(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: err.message });
