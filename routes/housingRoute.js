@@ -7,6 +7,7 @@ import {
   ShowAllHousing,
   GetUserName,
   GetApplicationInfo,
+  ShowUserHousingHR
 } from "../controllers/HousingController.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
 import {
@@ -17,11 +18,13 @@ import {
   GetSingleFacilityComments,
   UpdateReportStatus,
   UpdateComment,
+  addCommentHR
 } from "../controllers/FacilityReportController.js";
 
 //HousingController
 router.post("/", jwtValidation, restrictToHR, CreateHousing);
 router.get("/:housingId", jwtValidation, ShowUserHousing);
+router.get("/hr/:housingId", jwtValidation, ShowUserHousingHR);
 router.get("/", jwtValidation, restrictToHR, ShowAllHousing);
 router.delete("/:housingId", jwtValidation, restrictToHR, DeleteHousing);
 
@@ -30,6 +33,7 @@ router.post("/reports", jwtValidation, CreateFacilityReport);
 router.get("/reports/all", jwtValidation, ShowUserFacilityReports); //not in use
 router.get("/reports/:reportId", jwtValidation, GetSingleFacilityReport);
 router.post("/reports/:reportId/comments", jwtValidation, PostCommentToReport);
+router.post("/reports/hr/:reportId/comments", jwtValidation,   addCommentHR);
 router.get(
   "/reports/:reportId/comments",
   jwtValidation,

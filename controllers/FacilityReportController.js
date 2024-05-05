@@ -109,7 +109,11 @@ const PostCommentToReport = async (req, res) => {
         timestamp: Date.now(),
     }
     try {
-        const newReport = await FacilityReport.findById(reportId);
+        const newReport = await FacilityReport.findById(reportId)
+        .populate({
+            path: 'comments.createdBy',
+            model: 'User',
+        });
         if (!newReport) {
             return res.status(404).send({
                 message: "Facility report not found."
@@ -127,6 +131,35 @@ const PostCommentToReport = async (req, res) => {
         });
     }
 }
+
+const addCommentHR = async (req, res) => {
+    const reportId = req.params.reportId;
+    const userId = req.body.userId;
+    const description = req.body.description;
+
+    // Add a new comment to the specified report
+    const newComment = {
+        description: description,
+        createdBy: userId,
+        timestamp: Date.now(),
+    }
+    const updatedReport = await FacilityReport.findByIdAndUpdate(
+        reportId,
+        { $push: { comments: newComment } },
+        { new: true }
+    ).populate('createdBy') // Populate createdBy for the report
+    .populate({
+        path: 'comments.createdBy', // Populate createdBy for the comments
+        model: 'User'
+    });
+
+    if (!updatedReport) {
+        return res.status(404).send({ message: 'Report not found' });
+    }
+
+    return res.status(200).send({ newReport: updatedReport });
+};
+
 
 const GetSingleFacilityComments = async (req, res) => {
     const reportId = req.params.reportId;
@@ -204,5 +237,6 @@ export {
     PostCommentToReport,
     GetSingleFacilityComments,
     UpdateReportStatus,
-    UpdateComment
+    UpdateComment,
+    addCommentHR
 };
