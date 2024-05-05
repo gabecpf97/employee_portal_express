@@ -2,31 +2,71 @@ import Housing from '../models/Housing.js';
 import User from '../models/User.js';
 import Application from '../models/Application.js';
 
+// const ShowUserHousing = async (req, res) => {
+//     const housingId = req.params.housingId;
+//     try {
+//         const houseInfo = await Housing.findById(housingId).populate({
+//                 path: 'facilityReportsIds',
+//                 populate: {
+//                 path: 'comments.createdBy', // Ensure the createdBy in comments is populated
+//                 model: 'User', // Replace 'User' with the actual model name
+//                 },
+//             }).populate('residentIds');
+//         if(!houseInfo){
+//             return res.status(404).send({ message: "housing does not exist"})
+//         }
+//         const residents = []
+//         for(const residentId of houseInfo.residentIds){
+//             const profile = await Application.findOne({userId:residentId}).select("userId firstName middleName lastName preffered Name cellPhone email car")
+//             residents.push(profile)
+//         }
+//         return res.status(200).send({ houseInfo, residents})
+//     } catch (error) {
+//         return res.status(401).send({
+//             message: error.message
+//         });
+//     }
+// }
+
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
+
     try {
-        const houseInfo = await Housing.findById(housingId).populate({
+        const houseInfo = await Housing.findById(housingId)
+            .populate({
                 path: 'facilityReportsIds',
                 populate: {
-                path: 'comments.createdBy', // Ensure the createdBy in comments is populated
-                model: 'User', // Replace 'User' with the actual model name
+                    path: 'comments.createdBy',
+                    model: 'User',
                 },
-            }).populate('residentIds');
-        if(!houseInfo){
-            return res.status(404).send({ message: "housing does not exist"})
+            })
+            .populate('residentIds');
+
+        if (!houseInfo) {
+            return res.status(404).send({ message: "Housing does not exist" });
         }
-        const residents = []
-        for(const residentId of houseInfo.residentIds){
-            const profile = await Application.findOne({userId:residentId}).select("userId firstName middleName lastName preffered Name cellPhone email car")
-            residents.push(profile)
+
+        const residents = {};
+        for (const residentId of houseInfo.residentIds) {
+            const user = await User.findById(residentId).populate('applicationId');
+
+            if (user && user.status === 'approved') {
+                const profile = await Application.findOne({ userId: residentId })
+                    .select("userId firstName middleName lastName preferredName cellPhone email car");
+
+                if (profile) {
+                    residents[residentId._id] = profile;
+                }
+            }
         }
-        return res.status(200).send({ houseInfo, residents})
+        return res.status(200).send({ houseInfo, residents });
     } catch (error) {
-        return res.status(401).send({
-            message: error.message
-        });
+        console.error(error);
+        return res.status(500).send({ message: error.message });
     }
-}
+};
+
+
 
 const CreateHousing = async (req, res) => {
     const userId = req.body.userId;
