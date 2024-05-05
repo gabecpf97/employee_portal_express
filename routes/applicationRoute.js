@@ -1,5 +1,5 @@
 import express from "express";
-import applicationController from "../controllers/ApplicationController.js";
+import applicationController from "../controllers/applicationController.js";
 import applicationValidator from "../middlewares/ApplicationMiddleWare.js";
 import inputValidaton from "../middlewares/inputMiddleware.js";
 import { jwtValidation, restrictToHR } from "../middlewares/AuthMiddleware.js";
