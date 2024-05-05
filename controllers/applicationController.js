@@ -69,11 +69,9 @@ const application_getMy = async (req, res, next) => {
         return next({ code: 422, message: "No such user" });
       }
       if (theUser.status === "not start") {
-        return res
-          .status(200)
-          .send({
-            application: { userId: req.body.userId, status: "not start" },
-          });
+        return res.status(200).send({
+          application: { userId: req.body.userId, status: "not start" },
+        });
       }
       return next({ code: 422, message: "No such application" });
     } else {
@@ -161,14 +159,20 @@ const application_update = async (req, res, next) => {
       updatedApplication.feedback = theApplication.feedback;
 
       //Michael: if update request contains no document, use previous ones
-      if(!updatedApplication.picture || updatedApplication.picture === "https://employee-visa-documents.s3.us-east-2.amazonaws.com/profile.png"){
-        updatedApplication.picture = theApplication.picture
+      if (
+        !updatedApplication.picture ||
+        updatedApplication.picture ===
+          "https://employee-visa-documents.s3.us-east-2.amazonaws.com/profile.png"
+      ) {
+        updatedApplication.picture = theApplication.picture;
       }
-      if(!updatedApplication.workAuthorization.document){
-        updatedApplication.workAuthorization.document = theApplication.workAuthorization.document
+      if (!updatedApplication.workAuthorization.document) {
+        updatedApplication.workAuthorization.document =
+          theApplication.workAuthorization.document;
       }
-      if(!updatedApplication.driverLicense.document){
-        updatedApplication.driverLicense.document = theApplication.driverLicense.document
+      if (!updatedApplication.driverLicense.document) {
+        updatedApplication.driverLicense.document =
+          theApplication.driverLicense.document;
       }
       //---------------------------------------
       await Application.findByIdAndUpdate(
