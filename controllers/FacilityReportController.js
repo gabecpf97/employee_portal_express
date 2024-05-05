@@ -57,7 +57,11 @@ const ShowUserFacilityReports = async (req, res) => {
     const userId = req.body.userId;
     console.log(userId);
     try {
-        const reports = await FacilityReport.find({ createdBy: userId });
+        const reports = await FacilityReport.find({ createdBy: userId })
+        .populate({
+            path: 'comments.createdBy',
+            model: 'User',
+    }).populate('createdBy');
         return res.status(200).send({
             reports,
         });
