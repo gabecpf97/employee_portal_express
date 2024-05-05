@@ -64,7 +64,6 @@ const saveToAWS = async (req, res, next) => {
     req.body.application = convertFormDataToJson(req.body);
     next();
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 };
