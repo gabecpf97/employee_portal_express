@@ -5,7 +5,13 @@ import Application from '../models/Application.js';
 const ShowUserHousing = async (req, res) => {
     const housingId = req.params.housingId;
     try {
-        const houseInfo = await Housing.findById(housingId).populate('facilityReportsIds');
+        const houseInfo = await Housing.findById(housingId).populate({
+                path: 'facilityReportsIds',
+                populate: {
+                path: 'comments.createdBy', // Ensure the createdBy in comments is populated
+                model: 'User', // Replace 'User' with the actual model name
+                },
+            }).populate('residentIds');
         if(!houseInfo){
             return res.status(404).send({ message: "housing does not exist"})
         }
