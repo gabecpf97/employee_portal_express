@@ -30,10 +30,10 @@ const ApplicationSchema = new Schema({
   gender: { type: String }, //male, female, I do not want to answer
   citizenship: { type: String, required: true }, //green card, citizen, non-citizen
   workAuthorization: {
-    type: { type: String, required: true }, // h1b, l2, f1cpt, f1opt, h4, other
+    type: { type: String }, // h1b, l2, f1cpt, f1opt, h4, other
     document: { type: String }, //upload link to f1opt receipt, optional to other
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
+    startDate: { type: Date },
+    endDate: { type: Date },
   },
   driverLicense: {
     //empty if user does not have one

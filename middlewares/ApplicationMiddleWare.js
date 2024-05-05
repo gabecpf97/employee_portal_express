@@ -64,6 +64,22 @@ const applicationValidator = (req, res, next) => {
       .status(422)
       .send({ message: "Please enter a valid citizenship status" });
   }
+  // console.log(req.body.application);
+  try {
+    if (
+      (citizenship === "non-citizen" && !workAuthorization) ||
+      (workAuthorization &&
+        (!workAuthorization.type ||
+          !workAuthorization.startDate ||
+          !workAuthorization.endDate))
+    ) {
+      return res
+        .status(422)
+        .send({ message: "please submit work authorization document" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
   next();
 };
 
@@ -104,7 +120,7 @@ const checkIfEmpty = (
   if (!citizenship) {
     return { message: "Missing citizenship fields" };
   }
-  if (!workAuthorization) {
+  if (citizenship === "non-citizen" && !workAuthorization) {
     return { message: "Missing workAuthorization fields" };
   }
   if (!reference) {

@@ -6,7 +6,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const uploadImageToMulterSafe = (req, res, next) => {
   console.log("in safe");
-  console.log(req.body);
   uploadImageToMulter(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: err.message });
@@ -37,7 +36,6 @@ const saveToAWS = async (req, res, next) => {
       const command = new GetObjectCommand(paramsForRetrieve);
       picture = await getSignedUrl(S3, command, { expiresIn: 3600 });
     }
-
     let DriverLicense = "";
     if (files.driverLicense_document) {
       DriverLicense = await uploadImageToAWS(
@@ -47,7 +45,10 @@ const saveToAWS = async (req, res, next) => {
     }
 
     let WorkAuthorization = "";
-    if (files.workAuthorization_document) {
+    if (
+      req.body.citizenship === "non-citizen" &&
+      files.workAuthorization_document
+    ) {
       WorkAuthorization = await uploadImageToAWS(
         keys.WorkAuthorization,
         req.files.workAuthorization_document[0]

@@ -7,20 +7,22 @@ const convertFormDataToJson = (requestBody) => {
     car: JSON.parse(requestBody.car),
     reference: JSON.parse(requestBody.reference),
     emergency: JSON.parse(requestBody.emergency),
-    // emergency: requestBody.emergency.map((contact) => JSON.parse(contact)),
     picture: s3Keys.picture,
     driverLicense: {
       number: requestBody.driverLicense_number,
       expirationDate: requestBody.driverLicense_expirationDate,
       document: s3Keys.DriverLicense,
     },
-    workAuthorization: {
+  };
+
+  if (requestBody.citizenship === "non-citizen") {
+    workAuthorization = {
       type: requestBody.workAuthorization_type,
       document: s3Keys.WorkAuthorization,
       startDate: requestBody.workAuthorization_startDate,
       endDate: requestBody.workAuthorization_endDate,
-    },
-  };
+    };
+  }
 
   return applicationData;
 };
