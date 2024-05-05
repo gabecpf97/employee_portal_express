@@ -26,7 +26,10 @@ const get_optId_by_applicationId = async (req, res, next) => {
 // receive document from employee frontend to update status and return status
 const optrequest_update_doc = async (req, res, next) => {
   try {
-    const theOptRequest = await OPTRequest.findById(req.params.id);
+    const theOptRequest = await OPTRequest.findById(req.params.id).populate({
+      path: "appId",
+      select: "firstName lastName prefferedName workAuthorization",
+    });
     if (!theOptRequest) {
       return next({ code: 422, message: "No such OPT request" });
     } else {
@@ -132,7 +135,10 @@ const optrequest_get_all = async (req, res, next) => {
 
 const optrequest_hr_action = async (req, res, next) => {
   try {
-    const theRequest = await OPTRequest.findById(req.params.id);
+    const theRequest = await OPTRequest.findById(req.params.id).populate({
+      path: "appId",
+      select: "firstName lastName prefferedName workAuthorization",
+    });
     if (!theRequest) {
       return next({ code: 422, message: "No such OPT request" });
     } else {
@@ -146,7 +152,7 @@ const optrequest_hr_action = async (req, res, next) => {
         updateRequest.step = nextStep(theRequest.step);
       }
       await OPTRequest.findByIdAndUpdate(req.params.id, updateRequest, {});
-      res.status(200).send({ id: updateRequest._id });
+      res.status(200).send({ visa: updateRequest });
     }
   } catch (err) {
     return next({ err: 500, message: err.message });
