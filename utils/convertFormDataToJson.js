@@ -8,12 +8,15 @@ const convertFormDataToJson = (requestBody) => {
     reference: JSON.parse(requestBody.reference),
     emergency: JSON.parse(requestBody.emergency),
     picture: s3Keys.picture,
-    driverLicense: {
+  };
+
+  if (requestBody.driverLicense_number) {
+    applicationData.driverLicense = {
       number: requestBody.driverLicense_number,
       expirationDate: requestBody.driverLicense_expirationDate,
       document: s3Keys.DriverLicense,
-    },
-  };
+    };
+  }
 
   if (requestBody.citizenship === "non-citizen") {
     applicationData.workAuthorization = {
