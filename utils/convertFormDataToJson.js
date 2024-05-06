@@ -16,7 +16,7 @@ const convertFormDataToJson = (requestBody) => {
   };
 
   if (requestBody.citizenship === "non-citizen") {
-    workAuthorization = {
+    applicationData.workAuthorization = {
       type: requestBody.workAuthorization_type,
       document: s3Keys.WorkAuthorization,
       startDate: requestBody.workAuthorization_startDate,
