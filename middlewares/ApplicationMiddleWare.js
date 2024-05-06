@@ -21,8 +21,15 @@ const applicationValidator = (req, res, next) => {
   if (emptyCheck.code) {
     return res.status(422).send({ message: emptyCheck.message });
   }
-  const { status, picture, cellPhone, workPhone, gender, citizenship } =
-    req.body.application;
+  const {
+    status,
+    picture,
+    cellPhone,
+    workPhone,
+    gender,
+    citizenship,
+    workAuthorization,
+  } = req.body.application;
   // check status
   if (!checkValidStatus(status)) {
     return res.status(422).send({ message: "Please enter valid status" });

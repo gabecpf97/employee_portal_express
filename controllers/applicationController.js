@@ -166,11 +166,17 @@ const application_update = async (req, res, next) => {
       ) {
         updatedApplication.picture = theApplication.picture;
       }
-      if (!updatedApplication.workAuthorization.document) {
+      if (
+        updatedApplication.workAuthorization &&
+        !updatedApplication.workAuthorization.document
+      ) {
         updatedApplication.workAuthorization.document =
           theApplication.workAuthorization.document;
       }
-      if (!updatedApplication.driverLicense.document) {
+      if (
+        updatedApplication.driverLicense.number &&
+        !updatedApplication.driverLicense.document
+      ) {
         updatedApplication.driverLicense.document =
           theApplication.driverLicense.document;
       }
@@ -190,6 +196,7 @@ const application_update = async (req, res, next) => {
       return res.status(200).send({ application: updatedApplication });
     }
   } catch (err) {
+    console.log(err);
     return next({ code: 500, message: err.message });
   }
 };
