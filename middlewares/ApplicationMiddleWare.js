@@ -64,7 +64,6 @@ const applicationValidator = (req, res, next) => {
       .status(422)
       .send({ message: "Please enter a valid citizenship status" });
   }
-  // console.log(req.body.application);
   try {
     if (
       (citizenship === "non-citizen" && !workAuthorization) ||
